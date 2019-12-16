@@ -5,21 +5,27 @@
 #ifndef EX3__COMMAND_H_
 #define EX3__COMMAND_H_
 #include <iostream>
+
 #include <thread>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <vector>
 #include <unistd.h>
 #include <arpa/inet.h>
+#include <map>
 
 using namespace std;
 //command Interface
+
+
 class Command {
 
  public:
-  virtual int execute() = 0;
+  virtual int execute(vector<string> arrayStr) = 0;
   ~Command();
 };
+
+std::map<string,Command*> intoCommandMap;
 
 //function of open Command
 void openDataServer(int port) {
@@ -56,7 +62,7 @@ void openDataServer(int port) {
     char bufferRead[1024] = {0};
     int value = read(socketServer, bufferRead, 1024);
     //transfer the data in buffer to the data structure-fill/////////////////////
-    
+
   }
 
   //closing the socket
@@ -68,6 +74,7 @@ class OpenServerCommand : public Command {
     //open thread to to connect
     ////////change- need to get the port to this function instead of 5400///////
     std::thread threadServer(openDataServer, 5400);
+   return 2;
   }
 };
 
@@ -96,14 +103,16 @@ void connectControlClient(string adress, int port) {
   else{
     std::cerr << "connected to server" << std::endl;
   }
+
 }
 class ConnectCommand : public Command {
 
  public:
-  virtual int execute() {
+  virtual int execute(vector<string> arrayStr) {
     //open thread- as the client
     ///////////////////change to parameters////////////////
     std::thread threadClient(connectControlClient, "127.0.0.1", 5402);
+    return 2;
   }
 };
 
@@ -114,3 +123,4 @@ class DefineVarCommand : public Command {
 };
 
 #endif //EX3__COMMAND_H_
+
