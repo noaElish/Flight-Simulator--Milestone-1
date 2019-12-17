@@ -1,5 +1,3 @@
-#ifndef EX3__COMMAND_H_
-#define EX3__COMMAND_H_
 #include "Command.h"
 #include <iostream>
 #include <string.h>
@@ -13,8 +11,13 @@
 #include <vector>
 #include <unistd.h>
 #include <unordered_set>
-
+#include <arpa/inet.h>
 using namespace std;
+
+#ifndef EX3__COMMAND_H_
+#define EX3__COMMAND_H_
+
+
 
 /**
  * command Interface
@@ -102,7 +105,7 @@ class OpenServerCommand : virtual public Command{
 };
 
 //function of connect Command
-void connectControlClient(string adress, int port) {
+void connectControlClient(const char *adressConnect, int port) {
 
   //create new socket
   int socketClient = socket(AF_INET, SOCK_DGRAM, 0);
@@ -113,8 +116,7 @@ void connectControlClient(string adress, int port) {
   //create the object for the bind
   sockaddr_in addressSer;
   addressSer.sin_family = AF_INET;
-  //change to adress
-  addressSer.sin_addr.s_addr = inet_addr("127.0.0.1");
+  addressSer.sin_addr.s_addr = inet_addr(adressConnect);
   addressSer.sin_port = htons(port);
 
   int connectUs = connect(socketClient, (struct sockaddr *) &addressSer, sizeof(addressSer));
