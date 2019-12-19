@@ -24,7 +24,9 @@
 using namespace std;
 
 
-
+/**
+ * Class Interpreter
+ */
 class Interpreter {
 public:
     //constructor
@@ -41,6 +43,68 @@ public:
     void parser (vector<string> splittedStrings);
     //constructor
     ~Interpreter();
+};
+
+
+
+
+/*
+class Variable{
+
+private:
+    int value;
+    string sim;
+    //constructor - It is in the private area so objects cannot be created from outside.
+
+public:
+    Variable(int value, string sim);
+    //This method allows you to get the pointer to the only object created.
+  //  static Variable *getInstance();
+
+    //destructor
+    ~Variable();
+};
+ */
+
+/**
+ * Class Variable
+ */
+class Variable {
+private:
+    int value;
+    string sim;
+public:
+    //constructor
+    Variable(int value, string sim);
+    //constructor
+    ~Variable();
+};
+
+
+/**
+ * Class SymbolTable
+ */
+class SymbolTable{
+private:
+    static SymbolTable* instance;
+    //constructor - It is in the private area so objects cannot be created from outside.
+    SymbolTable();
+public:
+    map<string, Variable> symbolTable;
+    map<string, float > simMap;
+
+
+    //This method allows you to get the pointer to the only object created.
+    static SymbolTable *getInstance();
+
+
+    void upDateSymbolTable(string,Variable);
+    Variable getVariable(string name);
+    string* SetArrayOfSim();
+    void putInSimMap (int i, float num);
+
+    //destructor
+    ~SymbolTable();
 };
 
 

@@ -140,6 +140,12 @@ map <string, Command*> Interpreter::intoCommandMap(vector<string> splittedString
             key = splittedStrings[num+1];
             val = new DefineVarCommand(num+1);
             commandMap.insert({key, val});
+
+            Variable *var = new Variable(0, splittedStrings[num+4]);    /**************/
+            SymbolTable *symbolsMaps = symbolsMaps->getInstance();
+            symbolsMaps->upDateSymbolTable(key, *var);
+
+
         }else if ((key.compare("while") ==0)||(key.compare("for") ==0)||(key.compare("if") ==0)){
 
             if ((key.compare("while") ==0)||(key.compare("for") ==0)){
@@ -186,3 +192,130 @@ void Interpreter::parser (vector<string> splittedStrings){
 
 //destructor
 Interpreter::~Interpreter(){};
+
+
+
+
+
+
+
+/*
+Variable *Variable::getInstance(){
+    int value = 1;
+    string sim = " ";
+    static Variable varInstance(value, sim);
+    return &varInstance;
+}
+ */
+/**
+ * Class Variable
+ */
+
+//constructor
+Variable:: Variable(int value, string sim){};
+//constructor
+Variable::~Variable(){};
+
+
+
+/**
+ * Class SymbolTable
+ */
+
+
+//This method allows you to get the pointer to the only object created.
+/* Null, because instance will be initialized on demand. */
+SymbolTable* SymbolTable::instance = 0;
+
+SymbolTable* SymbolTable::getInstance(){
+    if (instance == 0)
+    {
+        instance = new SymbolTable();
+    }
+
+    return instance;
+}
+//constructor - It is in the private area so objects cannot be created from outside.
+SymbolTable::SymbolTable(){};
+
+
+SymbolTable *symbolsMaps = symbolsMaps->getInstance();
+SymbolTable *simMap = symbolsMaps->getInstance();
+
+void SymbolTable::upDateSymbolTable(string nameVar,Variable var){
+    instance->symbolTable.insert({nameVar,var});
+}
+
+Variable getVariable(string name){
+    symbolsMaps->symbolTable.find(name);
+}
+
+
+void SymbolTable::putInSimMap (int i, float num){
+    SymbolTable* instance = SymbolTable::getInstance();
+    string *arrSim = symbolsMaps->SetArrayOfSim();
+    instance->simMap.insert({arrSim[int(i)],num});
+    cout<<"string: "<<arrSim[int(i)]<<endl;
+    cout<<"float: "<<num<<endl;
+
+}
+
+
+
+string* SymbolTable::SetArrayOfSim(){
+    string arrSim[36];
+    arrSim[0]= "/instrumentation/airspeed-indicator/indicated-speed-kt";
+    arrSim[1]="/sim/time/warp";
+    arrSim[2]="/controls/switches/magnetos";
+    arrSim[3]="//instrumentation/heading-indicator/offset-deg";
+    arrSim[4]="/instrumentation/altimeter/indicated-altitude-ft";
+    arrSim[5]="/instrumentation/altimeter/pressure-alt-ft";
+    arrSim[6]="/instrumentation/attitude-indicator/indicated-pitch-deg";
+    arrSim[7]="/instrumentation/attitude-indicator/indicated-roll-deg";
+    arrSim[8]="/instrumentation/attitude-indicator/internal-pitch-deg";
+    arrSim[9]="/instrumentation/attitude-indicator/internal-roll-deg";
+    arrSim[10]="/instrumentation/encoder/indicated-altitude-ft";
+    arrSim[11]="/instrumentation/encoder/pressure-alt-ft";
+    arrSim[12]="/instrumentation/gps/indicated-altitude-ft";
+    arrSim[13]="/instrumentation/gps/indicated-ground-speed-kt";
+    arrSim[14]="/instrumentation/gps/indicated-vertical-speed";
+    arrSim[15]="/instrumentation/heading-indicator/indicated-heading-deg";
+    arrSim[16]="/instrumentation/magnetic-compass/indicated-heading-deg";
+    arrSim[17]="/instrumentation/slip-skid-ball/indicated-slip-skid";
+    arrSim[18]="/instrumentation/turn-indicator/indicated-turn-rate";
+    arrSim[19]="/instrumentation/vertical-speed-indicator/indicated-speed-fpm";
+    arrSim[20]="/controls/flight/aileron";
+    arrSim[21]="/controls/flight/elevator";
+    arrSim[22]="/controls/flight/rudder";
+    arrSim[23]="/controls/flight/flaps";
+    arrSim[24]="/controls/engines/engine/throttle";
+    arrSim[25]="/controls/engines/current-engine/throttle";
+    arrSim[26]="/controls/switches/master-avionics";
+    arrSim[27]="/controls/switches/starter";
+    arrSim[28]="/engines/active-engine/auto-start";
+    arrSim[29]="/controls/flight/speedbrake";
+    arrSim[30]="/sim/model/c172p/brake-parking";
+    arrSim[31]="/controls/engines/engine/primer";
+    arrSim[32]="/controls/engines/current-engine/mixture";
+    arrSim[33]="/controls/switches/master-bat";
+    arrSim[34]="/controls/switches/master-alt";
+    arrSim[35]="/engines/engine/rpm";
+
+
+/*
+ int t=0;
+    cout<<arrSim->size()<<endl;
+    while (t<36){
+        cout<<arrSim[t]<<endl;
+        t++;
+    }
+    cout<<t;
+    */
+
+}
+//destructor
+SymbolTable:: ~SymbolTable(){};
+
+
+
+//SymbolTable *symbolTable = SymbolTable::getInstance();

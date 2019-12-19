@@ -1,9 +1,6 @@
-//
-// Created by shira on 19.12.2019.
-//
 
 #include "Command.h"
-#include "Interpreter.h"
+#include "CMakeFiles/Interpreter.h"
 #include <thread>
 #include <iostream>
 #include <string>
@@ -20,55 +17,93 @@ Interpreter inter;
 
 //function of open Command
 void openDataServer(int port) {
-  //creating new socket
-  int socketServer = socket(AF_INET, SOCK_STREAM, 0);
-  if (socketServer == -1) {
-    //cant create socket
-    std::cerr << "cant create socket" << std::endl;
-  }
-  //create the object for the bind
-  sockaddr_in addressSer;
-  addressSer.sin_family = AF_INET;
-  addressSer.sin_addr.s_addr = INADDR_ANY;
-  addressSer.sin_port = htons(port);
+    //creating new socket
+    int socketServer = socket(AF_INET, SOCK_STREAM, 0);
+    if (socketServer == -1) {
+        //cant create socket
+        std::cerr << "cant create socket" << std::endl;
+    }
+    //create the object for the bind
+    sockaddr_in addressSer;
+    addressSer.sin_family = AF_INET;
+    addressSer.sin_addr.s_addr = INADDR_ANY;
+    addressSer.sin_port = htons(port);
 
-  //bind the socket to ip
-  if (bind(socketServer, (struct sockaddr *) &addressSer, sizeof(addressSer)) == -1) {
-    std::cerr << "cant bind socket to ip" << std::endl;
-  }
+    //bind the socket to ip
+    if (bind(socketServer, (struct sockaddr *) &addressSer, sizeof(addressSer)) == -1) {
+        std::cerr << "cant bind socket to ip" << std::endl;
+    }
 
-  //listen to the port
-  if (listen(socketServer, 5) == -1) {
-    std::cerr << "cant listen to ip" << std::endl;
-  }
+    //listen to the port
+    if (listen(socketServer, 5) == -1) {
+        std::cerr << "cant listen to ip" << std::endl;
+    }
 
-  //accept the client- flight gear
-  int clientSock = accept(socketServer, (struct sockaddr *) &addressSer, (socklen_t *) &addressSer);
-  if (clientSock == -1) {
-    std::cerr << "cant accept client" << std::endl;
-  }
+    //accept the client- flight gear
+    int clientSock = accept(socketServer, (struct sockaddr *) &addressSer, (socklen_t *) &addressSer);
+    if (clientSock == -1) {
+        std::cerr << "cant accept client" << std::endl;
+    }
 
 
 
-  //reading from the socket line by line-use loop-CHECK/////////////////
+    //reading from the socket line by line-use loop-CHECK/////////////////
 
-  //save each line to the data structure
-  char bufferRead[1024] = {0};
-  int value = read(socketServer, bufferRead, 1024);
-  int i;
-  string s = "";
-  for (i = 0; i < sizeof(bufferRead) / sizeof(char); i++) {
-    s = s + bufferRead[i];
-  }
-  vector<string> values;
-  string buf;
-  std::stringstream str(s);
-  while (str >> buf) {
-    values.push_back(buf);
-  }
+    //save each line to the data structure
+    char bufferRead[1024] = {0};
+    int value = read(socketServer, bufferRead, 1024);
+    cout<<"value:  "<< value<<endl;
+    int i;
+    string s = "";
+    /*
+    for (i = 0; i < sizeof(bufferRead) / sizeof(char); i++) {
 
-  //closing the socket
-  close(socketServer);
+        s = s + bufferRead[i];
+    }
+     */
+    /*
+    cout<<bufferRead<<endl;
+    for (i = 0; i < sizeof(bufferRead) / sizeof(char); i++) {
+        cout<<bufferRead[i]<<i<<endl;
+        if (bufferRead[i]==','){
+            cout<<i;
+            s;
+        }
+        s = s + bufferRead[i];
+    }
+    string token;
+    int num;
+    string array[36];
+    string sim;
+    SymbolTable *simMaps = simMaps->getInstance();
+    for (i=0; i<s.size();i++){
+        char aaaa = s[i];
+        if (s[i]=='\\'){
+            token = s.substr(0, s.find('\\'));
+            num = stoi(token);
+            sim = array[num];
+            Variable *var = new Variable(num, sim);
+            simMaps->simMap.insert({sim, *var});
+
+            s = s.erase(0, s.find('\\')+1);
+            i=0;
+        }
+    }
+*/
+
+    //SymbolTable *instance;
+    SymbolTable* instance = SymbolTable::getInstance();
+    //= symbolsMaps->getInstance();
+    float valueArray[36];
+    float num=0;
+    for (int i=0; i<36; i++){
+        valueArray[i]=num;
+        instance->putInSimMap(i, valueArray[i]);
+        num++;
+    }
+
+    //closing the socket
+    close(socketServer);
 }
 
 
@@ -78,12 +113,12 @@ void openDataServer(int port) {
 //constructor
 OpenServerCommand::OpenServerCommand() {};
 int OpenServerCommand::execute(vector<string> arrayStr, int i) {
-  cout << "in open server" << endl;
-  port = stoi(arrayStr[i + 1]);
-  //open thread to to connect
-  thread threadServer(openDataServer, port);
-  threadServer.join();
-  return 2;
+    cout << "in open server" << endl;
+    port = stoi(arrayStr[i + 1]);
+    //open thread to to connect
+    thread threadServer(openDataServer, port);
+    threadServer.join();
+    return 2;
 };
 //destructor
 OpenServerCommand::~OpenServerCommand() {};
@@ -96,35 +131,35 @@ ConnectCommand::ConnectCommand() {};
 //function of connect Command
 void connectControlClient(string adressConnect, int port) {
 
-  //create new socket
-  int socketClient = socket(AF_INET, SOCK_DGRAM, 0);
-  if (socketClient == -1) {
-    std::cerr << "cant create socket" << std::endl;
-  }
+    //create new socket
+    int socketClient = socket(AF_INET, SOCK_DGRAM, 0);
+    if (socketClient == -1) {
+        std::cerr << "cant create socket" << std::endl;
+    }
 
-  //create the object for the bind
-  sockaddr_in addressSer;
-  addressSer.sin_family = AF_INET;
-  addressSer.sin_addr.s_addr = inet_addr("127.0.0.1");
-  addressSer.sin_port = htons(port);
+    //create the object for the bind
+    sockaddr_in addressSer;
+    addressSer.sin_family = AF_INET;
+    addressSer.sin_addr.s_addr = inet_addr("127.0.0.1");
+    addressSer.sin_port = htons(port);
 
-  int connectUs = connect(socketClient, (struct sockaddr *) &addressSer, sizeof(addressSer));
-  //check if connected
-  if (connectUs == -1) {
-    std::cerr << "cant create socket" << std::endl;
-  } else {
-    std::cerr << "connected to server" << std::endl;
-  }
+    int connectUs = connect(socketClient, (struct sockaddr *) &addressSer, sizeof(addressSer));
+    //check if connected
+    if (connectUs == -1) {
+        std::cerr << "cant create socket" << std::endl;
+    } else {
+        std::cerr << "connected to server" << std::endl;
+    }
 }
 
 int ConnectCommand::execute(vector<string> arrayStr, int i) {
-  cout << "in connect command" << endl;
+    cout << "in connect command" << endl;
 
-  adress = arrayStr[i + 1];
-  port = stoi(arrayStr[i + 2]);
-  std::thread threadClient(connectControlClient, adress, port);
-  threadClient.join();
-  return 4;
+    adress = arrayStr[i + 1];
+    port = stoi(arrayStr[i + 2]);
+    std::thread threadClient(connectControlClient, adress, port);
+    threadClient.join();
+    return 4;
 }
 //destructor
 ConnectCommand::~ConnectCommand() {};
@@ -135,22 +170,22 @@ ConnectCommand::~ConnectCommand() {};
  */
 //constructor
 DefineVarCommand::DefineVarCommand(int num)
-    : index(num) {};
+        : index(num) {};
 
 int DefineVarCommand::execute(vector<string> arrayStr, int i) {
-  cout << "in var def" << endl;
-  /**need to change this func**///////////////////////////////////////////////////////////////////////
-  index = i;
-  if (arrayStr[index + 1].compare("=") == 0) {
-    return 2;
-  } else if ((arrayStr[index + 1].compare("while")) || (arrayStr[index + 1].compare("for")) ||
-      (arrayStr[index + 1].compare("if"))) {
-    return 1;
-  } else if ((arrayStr[index + 2].compare("sim") == 0)) {
-    return 5;
-  } else {
-    return 0;
-  }
+    cout << "in var def" << endl;
+    /**need to change this func**///////////////////////////////////////////////////////////////////////
+    index = i;
+    if (arrayStr[index + 1].compare("=") == 0) {
+        return 2;
+    } else if ((arrayStr[index + 1].compare("while")) || (arrayStr[index + 1].compare("for")) ||
+               (arrayStr[index + 1].compare("if"))) {
+        return 1;
+    } else if ((arrayStr[index + 2].compare("sim") == 0)) {
+        return 5;
+    } else {
+        return 0;
+    }
 }
 //destructor
 DefineVarCommand::~DefineVarCommand() {};
@@ -171,10 +206,10 @@ ConditionParser::~ConditionParser() {};
  */
 //constructor
 ifCommand::ifCommand(int num)
-    : index(num) {};
+        : index(num) {};
 int ifCommand::execute(vector<string> arrayStr, int i) {
-  cout << "in if command " << endl;
-  return 0;                              //????????????????????
+    cout << "in if command " << endl;
+    return 0;                              //????????????????????
 }
 //destructor
 ifCommand::~ifCommand() {};
@@ -186,13 +221,13 @@ ifCommand::~ifCommand() {};
 //constructor
 loopCommand::loopCommand(int num) : index(num) {};
 int loopCommand::execute(vector<string> arrayStr, int i) {
-  /**need to change this func**///////////////////////////////////////////////////////////////////////
-  while (arrayStr[index] != "}") {
-    cout << "in while  " << arrayStr[index] << endl;
-    index++;
-    num++;
-  }
-  return num;
+    /**need to change this func**///////////////////////////////////////////////////////////////////////
+    while (arrayStr[index] != "}") {
+        cout << "in while  " << arrayStr[index] << endl;
+        index++;
+        num++;
+    }
+    return num;
 }
 //destructor
 loopCommand::~loopCommand() {};
@@ -204,9 +239,9 @@ loopCommand::~loopCommand() {};
 //constructor
 Print::Print() {};
 int Print::execute(vector<string> arrayStr, int i) {
-  //print the string
-  cout << arrayStr[i + 1] << "_-----" << endl;
-  return 2;
+    //print the string
+    cout << arrayStr[i + 1] << "_-----" << endl;
+    return 2;
 }
 //destructor
 Print::~Print() {};
@@ -217,9 +252,10 @@ Print::~Print() {};
 //constructor
 Sleep::Sleep() {};
 int Sleep::execute(vector<string> arrayStr, int i) {
-  // sleep(stoi(arrayStr[i+1]));                           //??????????????????????????????
-  cout << "sleep  " << stoi(arrayStr[i + 1]) << endl;
-  return 2;
+    // sleep(stoi(arrayStr[i+1]));                           //??????????????????????????????
+    cout << "sleep  " << stoi(arrayStr[i + 1]) << endl;
+    return 2;
 }
 //destructor
 Sleep::~Sleep() {};
+
