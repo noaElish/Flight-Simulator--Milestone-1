@@ -1,10 +1,10 @@
 #include "Command.h"
+#include <thread>
 #include <iostream>
 #include <string.h>
 #include <fstream>
 #include <string>
 #include <vector>
-#include <thread>
 #include <map>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -36,10 +36,10 @@ struct info{
   int value;
   string sim;
 };
-//map for the command map
-std::map<string,Command*> intoCommandMap;
 //map-symbol table
+std::map<string, info> symbolTableSim;
 std::map<string, info> symbolTable;
+
 
 
 //function of open Command
@@ -74,8 +74,8 @@ void openDataServer(int port){
   //reading from the socket line by line-use loop-CHECK/////////////////
   for (int i = 0; i < 23; i++) {
     //save each line to the data structure
-    char bufferRead[1024] = {0};
-    int value = read(socketServer, bufferRead, 1024);
+    char bufferRead[56] = {0};
+    int value = read(socketServer, bufferRead, 56);
     //transfer the data in buffer to the data structure-fill/////////////////////
 
   }
@@ -105,7 +105,7 @@ class OpenServerCommand : virtual public Command{
 };
 
 //function of connect Command
-void connectControlClient(const char *adressConnect, int port) {
+void connectControlClient(string adressConnect, int port) {
 
   //create new socket
   int socketClient = socket(AF_INET, SOCK_DGRAM, 0);
@@ -116,7 +116,7 @@ void connectControlClient(const char *adressConnect, int port) {
   //create the object for the bind
   sockaddr_in addressSer;
   addressSer.sin_family = AF_INET;
-  addressSer.sin_addr.s_addr = inet_addr(adressConnect);
+  addressSer.sin_addr.s_addr = inet_addr("127.0.0.1");
   addressSer.sin_port = htons(port);
 
   int connectUs = connect(socketClient, (struct sockaddr *) &addressSer, sizeof(addressSer));
@@ -134,13 +134,16 @@ void connectControlClient(const char *adressConnect, int port) {
  */
 class ConnectCommand : public Command{
  protected:
-  int adress;
+
  public:
+  string adress;
+  int port;
   ConnectCommand(){};
   int execute(vector<string> arrayStr, int i) {
     cout<<"in connect command"<<endl;
-    adress = stoi(arrayStr[i+1]);
-    std::thread threadClient(connectControlClient,adress, arrayStr[i+2]);
+    adress = arrayStr[i+1];
+    port= stoi(arrayStr[i+2]);
+    std::thread threadClient(connectControlClient,adress, port);
     return 4;
   }
   //destructor
