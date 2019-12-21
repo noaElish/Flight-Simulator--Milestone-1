@@ -252,7 +252,9 @@ string Variable::getDir(){
 string Variable::getSim(){
   return this->sim;
 }
-
+float Variable::getVar(){
+  return this->value;
+}
 //constructor
 Variable::~Variable(){};
 
