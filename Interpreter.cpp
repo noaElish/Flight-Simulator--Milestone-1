@@ -249,6 +249,10 @@ void Variable::updateValue(float num){
 string Variable::getDir(){
     return this->direction;
 }
+string Variable::getSim(){
+  return this->sim;
+}
+
 //constructor
 Variable::~Variable(){};
 
