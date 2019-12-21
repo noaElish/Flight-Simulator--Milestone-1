@@ -139,14 +139,15 @@ map <string, Command*> Interpreter::intoCommandMap(vector<string> splittedString
             commandMap.insert({key, val});
         }else if (key.compare("var") ==0){              /**need to change this**/
 
-           // key = splittedStrings[num+1];
+            key = splittedStrings[num+1];
             val = new DefineVarCommand();
             commandMap.insert({key, val});
-/*delete this
-            Variable *var = new Variable(0, splittedStrings[num+4], splittedStrings[num+3]);
+
+
+            Variable *var = new Variable(0, splittedStrings[num+4], splittedStrings[num+2]);
             SymbolTable *symbolsMaps = symbolsMaps->getInstance();
-            symbolsMaps->upDateSymbolTable(key, *var);
-*/
+            symbolsMaps->upDateSymbolTable(splittedStrings[num+1], *var);
+
 
         }else if ((key.compare("while") ==0)||(key.compare("for") ==0)||(key.compare("if") ==0)){
 
@@ -177,10 +178,13 @@ map <string, Command*> Interpreter::intoCommandMap(vector<string> splittedString
 //This function goes on array and executes the commands
 void Interpreter::parser (vector<string> splittedStrings){
     //map to commands
+
     map <string, Command*> commandMap;
     commandMap = intoCommandMap(splittedStrings, commandMap);
+
     //instance to symbol table
     SymbolTable *symbolsMaps = symbolsMaps->getInstance();
+    //symbolsMaps->intilizationCommandMap(splittedStrings);
     //execute all the commands
     int i;
     int indexJump=0;
@@ -190,13 +194,23 @@ void Interpreter::parser (vector<string> splittedStrings){
             c=commandMap.find(splittedStrings[i])->second;
             indexJump = c->execute(splittedStrings, i);
             i=i+indexJump-1;
-        }else if (symbolsMaps->symbolTable.count(splittedStrings[i])!=0){
+        }
+
+        /*
+        else if (symbolsMaps->symbolTable.count(splittedStrings[i])!=0){
             // variable = num/ex1
-            symbolsMaps->symbolTable.find(splittedStrings[i])->second.updateValue(stoi(splittedStrings[i+2]));
+            //symbolsMaps->symbolTable.find(splittedStrings[i])->second.updateValue(stoi(splittedStrings[i+2]));
+
+
+            c = new DefineVarCommand();
+            indexJump = c->execute(splittedStrings, i);
+            i=i+indexJump-1;
+
             //i change the value in Variable. need to change also in simulator -> or <-
-            /***********************************************/
+            /***********************************************
 
         }
+        */
     }
 }
 
@@ -231,6 +245,10 @@ Variable::Variable(float value, string sim, string direction)
 void Variable::updateValue(float num){
     value=num;
 }
+//this method return the direction of variable
+string Variable::getDir(){
+    return this->direction;
+}
 //constructor
 Variable::~Variable(){};
 
@@ -260,13 +278,15 @@ SymbolTable::SymbolTable(){};
 SymbolTable *symbolsMaps = symbolsMaps->getInstance();
 SymbolTable *simMap = symbolsMaps->getInstance();
 
+void SymbolTable::intilizationCommandMap(vector<string> splittedStrings){
+    map <string, Command*> commandMap;
+    Interpreter i;
+    commandMap = i.intoCommandMap(splittedStrings, commandMap);
+}
+
 void SymbolTable::upDateSymbolTable(string nameVar,Variable var){
     instance->symbolTable.insert({nameVar,var});
 }
-void SymbolTable::putInSymbolTable(string varName,Variable var){
-    instance->symbolTable.insert({varName,var});
-}
-
 
 Variable SymbolTable::getVariable(string name){
     symbolsMaps->symbolTable.find(name);
@@ -285,6 +305,14 @@ void SymbolTable::putInSimMap (int i, float num){
 }
 
 
+float getValueFromSim(string sim){
+    float returnIt;
+    auto search= simMap->simMap.find(sim);
+    if (search != simMap->simMap.end()){
+        returnIt = search->second;
+    }
+    return returnIt;
+}
 
 string SymbolTable::SetArrayOfSim(int i){
     string arrSim[36];
@@ -324,24 +352,8 @@ string SymbolTable::SetArrayOfSim(int i){
     arrSim[33]="/controls/switches/master-bat";
     arrSim[34]="/controls/switches/master-alt";
     arrSim[35]="/engines/engine/rpm";
-
-
-/*
- int t=0;
-    cout<<arrSim->size()<<endl;
-    while (t<36){
-        cout<<arrSim[t]<<endl;
-        t++;
-    }
-    cout<<t;
-    */
-
-return arrSim[i];
-
+    return arrSim[i];
 }
+
 //destructor
 SymbolTable:: ~SymbolTable(){};
-
-
-
-//SymbolTable *symbolTable = SymbolTable::getInstance();

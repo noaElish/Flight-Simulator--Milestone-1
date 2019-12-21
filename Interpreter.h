@@ -46,26 +46,6 @@ public:
 };
 
 
-
-
-/*
-class Variable{
-
-private:
-    int value;
-    string sim;
-    //constructor - It is in the private area so objects cannot be created from outside.
-
-public:
-    Variable(int value, string sim);
-    //This method allows you to get the pointer to the only object created.
-  //  static Variable *getInstance();
-
-    //destructor
-    ~Variable();
-};
- */
-
 /**
  * Class Variable
  */
@@ -78,6 +58,7 @@ public:
     //constructor
     Variable(float value, string sim, string direction);
     void updateValue(float num);
+    string getDir();
     //constructor
     ~Variable();
 };
@@ -92,19 +73,20 @@ private:
     //constructor - It is in the private area so objects cannot be created from outside.
     SymbolTable();
 public:
+    //map to mane of variable and the Variable object
     map<string, Variable> symbolTable;
     map<string, float > simMap;
-
+    //map to commands
+    map <string, Command*> commandMap;
 
     //This method allows you to get the pointer to the only object created.
     static SymbolTable *getInstance();
-
-    void putInSymbolTable(string varName,Variable var);
+    void intilizationCommandMap(vector<string> splittedStrings);
     void upDateSymbolTable(string,Variable);
     Variable getVariable(string name);
     string SetArrayOfSim(int i);
     void putInSimMap (int i, float num);
-
+    float getValueFromSim(string sim);
     //destructor
     ~SymbolTable();
 };
