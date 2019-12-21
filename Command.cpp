@@ -1,6 +1,8 @@
 
 #include "Command.h"
-#include "CMakeFiles/Interpreter.h"
+#include "Interpreter.h"
+#include "Expression.h"
+#include "ex1.h"
 #include <thread>
 #include <iostream>
 #include <string>
@@ -176,33 +178,72 @@ ConnectCommand::~ConnectCommand() {};
  */
 //constructor
 DefineVarCommand::DefineVarCommand(){};
-
 int DefineVarCommand::execute(vector<string> arrayStr, int i) {
-    /*
-    float value = 3;
-    string sim = "p";
-    string direction = "o";
-    SymbolTable *symbolsMaps = symbolsMaps->getInstance();
-    Variable variable = new Variable(value,sim, direction);
-   // v= new Variable(3, "h", "o");
-    string d= "hh";
-    //symbolsMaps->symbolTable.insert(d, var);
-    symbolsMaps->putInSymbolTable(d,variable);
-    */
+  /*
+  float value = 3;
+  string sim = "p";
+  string direction = "o";
+  SymbolTable *symbolsMaps = symbolsMaps->getInstance();
+  Variable variable = new Variable(value,sim, direction);
+ // v= new Variable(3, "h", "o");
+  string d= "hh";
+  //symbolsMaps->symbolTable.insert(d, var);
+  symbolsMaps->putInSymbolTable(d,variable);
+  */
 
-    cout << "in var def" << endl;
-    /**need to change this func**///////////////////////////////////////////////////////////////////////
-    index = i;
-    if (arrayStr[index + 1].compare("=") == 0) {
-        return 2;
-    } else if ((arrayStr[index + 1].compare("while")) || (arrayStr[index + 1].compare("for")) ||
-               (arrayStr[index + 1].compare("if"))) {
-        return 1;
-    } else if ((arrayStr[index + 2].compare("sim") == 0)) {
-        return 5;
-    } else {
-        return 0;
-    }
+  cout << "in var def" << endl;
+  /**need to change this func**///////////////////////////////////////////////////////////////////////
+  index = i;
+
+  SymbolTable *instance = instance->getInstance();
+
+  string saveName = arrayStr[i];
+  //send the string after the "=" to expression
+  Inter *i1 = new Inter();
+  Expression *next;
+  next = i1->interpret(arrayStr[i + 2]);
+  double value = next->calculate();
+
+  //check the direction
+  Variable check = instance->symbolTable.at(arrayStr[i]);
+  string dir = check.getDir();
+
+  //update the value in the first map
+  if (dir == "->") {
+    //change the value in the symbol table
+    //erase the old one
+    Variable check = instance->symbolTable.at(arrayStr[i]);
+    string sim = check.getSim();
+    instance->symbolTable.erase(arrayStr[i]);
+    //create new value
+    Variable* insert= new Variable(stoi(arrayStr[i+2]), sim, dir);
+    string name= arrayStr[i];
+    instance->symbolTable.insert({name,*insert});
+    //change the value in the sim table
+    instance->simMap.erase(sim);
+    instance->simMap.insert({sim,value});
+
+  } else if (dir == "<-") {
+      //save the value from the sim table
+      float saveValue= instance->getValueFromSim(arrayStr[i+2]);
+      //save it to the symbol table
+    Variable* insert= new Variable(saveValue, arrayStr[i+2], dir);
+    instance->symbolTable.erase(arrayStr[i]);
+    string name= arrayStr[i];
+    instance->symbolTable.insert({name,*insert});
+  }
+
+
+  /*if (arrayStr[index + 1].compare("=") == 0) {
+    return 2;
+  } else if ((arrayStr[index + 1].compare("while")) || (arrayStr[index + 1].compare("for")) ||
+      (arrayStr[index + 1].compare("if"))) {
+    return 1;
+  } else if ((arrayStr[index + 2].compare("sim") == 0)) {
+    return 5;
+  } else {
+    return 0;
+  }*/
 }
 //destructor
 DefineVarCommand::~DefineVarCommand() {};
