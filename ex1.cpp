@@ -10,6 +10,7 @@
 #include <stack>
 #include <map>
 #include "regex"
+#include "Interpreter.h"
 using namespace std;
 
 /*this function define class value
@@ -144,7 +145,7 @@ double UMinus::calculate() {
 
 //variables for the method
 char *saveStr;
-map<string, double> mapVar;
+//map<string, double> mapVar;
 queue<string> expHolder;
 stack<char> operHolder;
 stack<Expression *> expressionStack;
@@ -160,7 +161,7 @@ Inter::Inter() {
 //this method change a string to expression
 //Expression *interpret(string toExp) {
 Expression* Inter::interpret(string toExp) {
-
+  SymbolTable *instance = instance->getInstance();
   //loop that goes over the string
   for (unsigned int i = 0; i < toExp.length(); i++) {
 
@@ -314,10 +315,12 @@ Expression* Inter::interpret(string toExp) {
     while ((expHolder.front() != "+") && (expHolder.front() != "-") && (expHolder.front() != "/")
         && (expHolder.front() != "*") && (expHolder.front() != "$")) {
       //if this is a variable
-      if (mapVar.count(expHolder.front())) {
+      if (instance->symbolTable.count(expHolder.front())) {
         charSave = expHolder.front();
         //find the value in the map
-        valueSave = mapVar[charSave];
+        Variable check = instance->symbolTable.at(charSave);
+
+        valueSave = check.getVar();
         //create new expression of variable
         toInsert = new var(charSave, valueSave);
       } else {
@@ -384,6 +387,8 @@ void Inter::setVariables(string stringA) {
   int p = 0;
   string charSave;
   regex regexCheck("((\\+|-)?[[:digit:]]+)(\\.(([[:digit:]]+)))?");
+  SymbolTable *instance = instance->getInstance();
+
 
   for (unsigned int i = 0; i < stringA.length(); i++) {
     if (stringA[i] == '=') {
@@ -408,11 +413,13 @@ void Inter::setVariables(string stringA) {
       if (regex_match(stringA.substr(i + 1, count), regexCheck)) {
         //if there are no problem with the expression, save to map
         doubSave = std::stod(stringA.substr(i + 1, count));
-        if (mapVar.find(charSave) == mapVar.end()) {
-          mapVar.insert(pair<string, double>(charSave, doubSave));
+        if (instance->symbolTable.find(charSave) == instance->symbolTable.end()) {
+          Variable check = instance->symbolTable.at(charSave);
+          instance->symbolTable.insert(pair<string, Variable>(charSave, check));
         } else {
-          mapVar.erase(charSave);
-          mapVar.insert(pair<string, double>(charSave, doubSave));
+          instance->symbolTable.erase(charSave);
+          Variable check = instance->symbolTable.at(charSave);
+          instance->symbolTable.insert(pair<string, Variable>(charSave, check));
         }
       } else {
         throw "error regex";
