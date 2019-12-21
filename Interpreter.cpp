@@ -117,6 +117,8 @@ vector<string> Interpreter::lexer(char* fileName){
 //This function builds a map of strings and commands
 map <string, Command*> Interpreter::intoCommandMap(vector<string> splittedStrings,map <string, Command*> commandMap ){
     string key;
+    string direction;
+    float value;
     Command* val = nullptr;
     int num=0;
     //iterator for vector
@@ -137,14 +139,14 @@ map <string, Command*> Interpreter::intoCommandMap(vector<string> splittedString
             commandMap.insert({key, val});
         }else if (key.compare("var") ==0){              /**need to change this**/
 
-            key = splittedStrings[num+1];
-            val = new DefineVarCommand(num+1);
+           // key = splittedStrings[num+1];
+            val = new DefineVarCommand();
             commandMap.insert({key, val});
-
-            Variable *var = new Variable(0, splittedStrings[num+4]);    /**************/
+/*delete this
+            Variable *var = new Variable(0, splittedStrings[num+4], splittedStrings[num+3]);
             SymbolTable *symbolsMaps = symbolsMaps->getInstance();
             symbolsMaps->upDateSymbolTable(key, *var);
-
+*/
 
         }else if ((key.compare("while") ==0)||(key.compare("for") ==0)||(key.compare("if") ==0)){
 
@@ -177,6 +179,8 @@ void Interpreter::parser (vector<string> splittedStrings){
     //map to commands
     map <string, Command*> commandMap;
     commandMap = intoCommandMap(splittedStrings, commandMap);
+    //instance to symbol table
+    SymbolTable *symbolsMaps = symbolsMaps->getInstance();
     //execute all the commands
     int i;
     int indexJump=0;
@@ -186,6 +190,12 @@ void Interpreter::parser (vector<string> splittedStrings){
             c=commandMap.find(splittedStrings[i])->second;
             indexJump = c->execute(splittedStrings, i);
             i=i+indexJump-1;
+        }else if (symbolsMaps->symbolTable.count(splittedStrings[i])!=0){
+            // variable = num/ex1
+            symbolsMaps->symbolTable.find(splittedStrings[i])->second.updateValue(stoi(splittedStrings[i+2]));
+            //i change the value in Variable. need to change also in simulator -> or <-
+            /***********************************************/
+
         }
     }
 }
@@ -212,7 +222,15 @@ Variable *Variable::getInstance(){
  */
 
 //constructor
-Variable:: Variable(int value, string sim){};
+Variable::Variable(float value, string sim, string direction)
+        :value(value){
+    sim = sim;
+    direction = direction;
+};
+//this method update the value
+void Variable::updateValue(float num){
+    value=num;
+}
 //constructor
 Variable::~Variable(){};
 
@@ -245,24 +263,30 @@ SymbolTable *simMap = symbolsMaps->getInstance();
 void SymbolTable::upDateSymbolTable(string nameVar,Variable var){
     instance->symbolTable.insert({nameVar,var});
 }
+void SymbolTable::putInSymbolTable(string varName,Variable var){
+    instance->symbolTable.insert({varName,var});
+}
 
-Variable getVariable(string name){
+
+Variable SymbolTable::getVariable(string name){
     symbolsMaps->symbolTable.find(name);
 }
 
 
 void SymbolTable::putInSimMap (int i, float num){
     SymbolTable* instance = SymbolTable::getInstance();
-    string *arrSim = symbolsMaps->SetArrayOfSim();
-    instance->simMap.insert({arrSim[int(i)],num});
-    cout<<"string: "<<arrSim[int(i)]<<endl;
+    string simString = symbolsMaps->SetArrayOfSim(i);
+    instance->simMap.insert({simString,num});
+    /*
+    cout<<"string: "<<simString<<endl;
     cout<<"float: "<<num<<endl;
+     */
 
 }
 
 
 
-string* SymbolTable::SetArrayOfSim(){
+string SymbolTable::SetArrayOfSim(int i){
     string arrSim[36];
     arrSim[0]= "/instrumentation/airspeed-indicator/indicated-speed-kt";
     arrSim[1]="/sim/time/warp";
@@ -311,6 +335,8 @@ string* SymbolTable::SetArrayOfSim(){
     }
     cout<<t;
     */
+
+return arrSim[i];
 
 }
 //destructor
