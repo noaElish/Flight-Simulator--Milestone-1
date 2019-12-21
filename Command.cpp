@@ -91,15 +91,21 @@ void openDataServer(int port) {
     }
 */
 
-    //SymbolTable *instance;
+   /******************************************************************************/
     SymbolTable* instance = SymbolTable::getInstance();
-    //= symbolsMaps->getInstance();
     float valueArray[36];
     float num=0;
-    for (int i=0; i<36; i++){
-        valueArray[i]=num;
-        instance->putInSimMap(i, valueArray[i]);
+    for (i=0; i<36; i++){
+        valueArray[i] = num;
         num++;
+        instance->putInSimMap(i, valueArray[i]);
+        num=i;
+        //num++;
+    }
+
+    //put sim and value in simMAp
+    for (i=0; i<36; i++){
+        instance->putInSimMap(i, valueArray[i]);
     }
 
     //closing the socket
@@ -169,10 +175,21 @@ ConnectCommand::~ConnectCommand() {};
  * Class for DefineVarCommand
  */
 //constructor
-DefineVarCommand::DefineVarCommand(int num)
-        : index(num) {};
+DefineVarCommand::DefineVarCommand(){};
 
 int DefineVarCommand::execute(vector<string> arrayStr, int i) {
+    /*
+    float value = 3;
+    string sim = "p";
+    string direction = "o";
+    SymbolTable *symbolsMaps = symbolsMaps->getInstance();
+    Variable variable = new Variable(value,sim, direction);
+   // v= new Variable(3, "h", "o");
+    string d= "hh";
+    //symbolsMaps->symbolTable.insert(d, var);
+    symbolsMaps->putInSymbolTable(d,variable);
+    */
+
     cout << "in var def" << endl;
     /**need to change this func**///////////////////////////////////////////////////////////////////////
     index = i;

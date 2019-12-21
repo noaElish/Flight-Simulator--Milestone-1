@@ -71,11 +71,13 @@ public:
  */
 class Variable {
 private:
-    int value;
+    float value;
     string sim;
+    string direction;
 public:
     //constructor
-    Variable(int value, string sim);
+    Variable(float value, string sim, string direction);
+    void updateValue(float num);
     //constructor
     ~Variable();
 };
@@ -97,10 +99,10 @@ public:
     //This method allows you to get the pointer to the only object created.
     static SymbolTable *getInstance();
 
-
+    void putInSymbolTable(string varName,Variable var);
     void upDateSymbolTable(string,Variable);
     Variable getVariable(string name);
-    string* SetArrayOfSim();
+    string SetArrayOfSim(int i);
     void putInSimMap (int i, float num);
 
     //destructor
