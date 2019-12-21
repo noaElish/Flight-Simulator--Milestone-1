@@ -60,6 +60,7 @@ public:
     void updateValue(float num);
     string getDir();
       string getSim();
+  float getVar();
 
     
     //constructor
