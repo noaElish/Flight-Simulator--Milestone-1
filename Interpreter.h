@@ -59,6 +59,9 @@ public:
     Variable(float value, string sim, string direction);
     void updateValue(float num);
     string getDir();
+      string getSim();
+
+    
     //constructor
     ~Variable();
 };
