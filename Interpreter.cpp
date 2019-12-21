@@ -309,13 +309,13 @@ void SymbolTable::putInSimMap (int i, float num){
 }
 
 
-float getValueFromSim(string sim){
-    float returnIt;
-    auto search= simMap->simMap.find(sim);
-    if (search != simMap->simMap.end()){
-        returnIt = search->second;
-    }
-    return returnIt;
+float SymbolTable::getValueFromSim(string sim){
+  float returnIt;
+  auto search= simMap.find(sim);
+  if (search != simMap.end()){
+    returnIt = search->second;
+  }
+  return returnIt;
 }
 
 string SymbolTable::SetArrayOfSim(int i){
