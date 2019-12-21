@@ -51,7 +51,7 @@ void openDataServer(int port) {
 
     //save each line to the data structure
     char bufferRead[1024] = {0};
-    int value = read(socketServer, bufferRead, 1024);
+    int value = read(clientSock, bufferRead, 1024);
     cout<<"value:  "<< value<<endl;
     int i;
     string s = "";
