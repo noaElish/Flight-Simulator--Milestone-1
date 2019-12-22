@@ -311,8 +311,22 @@ int loopCommand::execute(vector<string> arrayStr, int i) {
   }
   //save the sign of the loop
   string signLoop = arrayStr[i + 2];
-  //save the number of the loop
-  int numberLoop = stoi(arrayStr[i + 3]);
+  //check if the third string is a number
+  int numberLoop;
+  if( arrayStr[i+3].find_first_of("0123456789")!=std::string::npos ){
+    //is it digits
+    //save the number of the loop
+    numberLoop = stoi(arrayStr[i + 3]);
+  }
+  else{
+    //check its value in the map
+    auto search = symbolsMaps->symbolTable.find(nameCon);
+    if (search != symbolsMaps->symbolTable.end()) {
+      *nameLoopVar = search->second;
+      numberLoop = nameLoopVar->getVar();
+    }
+  }
+
 
   if (signLoop == "<=") {
     while (nameLoopNum <= numberLoop) {
