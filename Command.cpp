@@ -16,7 +16,7 @@ using namespace std;
 
 Interpreter inter;
 
-/*function of open Command*/
+//function of open Command
 void openDataServer(int port) {
   //creating new socket
   int socketServer = socket(AF_INET, SOCK_STREAM, 0);
@@ -46,8 +46,7 @@ void openDataServer(int port) {
     std::cerr << "cant accept client" << std::endl;
   }
 
-
-  //reading from the socket line by line-use loop-CHECK/////////////////
+  //reading from the socket line by line-use loops
   //save each line to the data structure
   char bufferRead[1024] = {0};
   int value;
@@ -85,7 +84,6 @@ void openDataServer(int port) {
       i++;
     }
     i=0;
-
   }
   //closing the socket
   close(socketServer);
@@ -97,11 +95,13 @@ void openDataServer(int port) {
  */
 //constructor
 OpenServerCommand::OpenServerCommand() {};
+//method of command execute
 int OpenServerCommand::execute(vector<string> arrayStr, int i) {
   cout << "in open server" << endl;
   port = stoi(arrayStr[i + 1]);
   //open thread to to connect
   thread threadServer(openDataServer, port);
+  //join the thread
   threadServer.join();
   return 2;
 };
@@ -115,19 +115,16 @@ ConnectCommand::ConnectCommand() {};
 
 //function of connect Command
 void connectControlClient(string adressConnect, int port) {
-
   //create new socket
   int socketClient = socket(AF_INET, SOCK_DGRAM, 0);
   if (socketClient == -1) {
     std::cerr << "cant create socket" << std::endl;
   }
-
   //create the object for the bind
   sockaddr_in addressSer;
   addressSer.sin_family = AF_INET;
   addressSer.sin_addr.s_addr = inet_addr("127.0.0.1");
   addressSer.sin_port = htons(port);
-
   int connectUs = connect(socketClient, (struct sockaddr *) &addressSer, sizeof(addressSer));
   //check if connected
   if (connectUs == -1) {
@@ -137,24 +134,26 @@ void connectControlClient(string adressConnect, int port) {
   }
 }
 
+//execute the connect command
 int ConnectCommand::execute(vector<string> arrayStr, int i) {
   cout << "in connect command" << endl;
-
   adress = arrayStr[i + 1];
   port = stoi(arrayStr[i + 2]);
+  //open new thread
   std::thread threadClient(connectControlClient, adress, port);
+  //join the thread
   threadClient.join();
   return 4;
 }
 //destructor
 ConnectCommand::~ConnectCommand() {};
 
-
 /**
  * Class for DefineVarCommand
  */
 //constructor
 DefineVarCommand::DefineVarCommand(){};
+//method of variable execute
 int DefineVarCommand::execute(vector<string> arrayStr, int i) {
   cout << "in var def" << endl;
   index = i;
@@ -164,6 +163,7 @@ int DefineVarCommand::execute(vector<string> arrayStr, int i) {
   Inter *i1 = new Inter();
   Expression *next;
   next = i1->interpret(arrayStr[i + 2]);
+  //calculate the expression
   double value = next->calculate();
 
   //check the direction
@@ -287,7 +287,7 @@ int loopCommand::execute(vector<string> arrayStr, int i) {
     }
   }
 
-
+//start check the sign of the loop
   if (signLoop == "<=") {
     while (nameLoopNum <= numberLoop) {
       for (varLoop k: arr) {
