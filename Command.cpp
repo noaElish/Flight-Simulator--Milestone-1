@@ -266,13 +266,97 @@ ifCommand::~ifCommand() {};
 //constructor
 loopCommand::loopCommand(int num) : index(num) {};
 int loopCommand::execute(vector<string> arrayStr, int i) {
-    /**need to change this func**///////////////////////////////////////////////////////////////////////
-    while (arrayStr[index] != "}") {
-        cout << "in while  " << arrayStr[index] << endl;
-        index++;
-        num++;
+  //create symbol map
+  SymbolTable *symbolsMaps = symbolsMaps->getInstance();
+  //create new struct to save the variable name and index in the array
+  struct varLoop{
+    string nameVr;
+    int indexVr;
+  };
+
+  int j = index;
+  //count the number of num to return
+  while (arrayStr[j] != "}") {
+    cout << "in while  " << arrayStr[j] << endl;
+    j++;
+    num++;
+  }
+
+  j = index;
+  //create new array to hold the variables we want to execute
+  varLoop arr[(num - 4) / 3];
+  int p = 0;
+  //go over the loop again
+  while (arrayStr[j] != "}") {
+    if (symbolsMaps->symbolTable.find(arrayStr[j]) == symbolsMaps->symbolTable.end()) {
+      //not found
+    } else {
+      //found- save this name to our array - add index number and name
+      arr[p].nameVr = arrayStr[j];
+      arr[p].indexVr= j;
+      p++;
     }
-    return num;
+    j++;
+  }
+
+  //FOR THE CONDITION
+  //save the variable-and its value
+  string nameCon = arrayStr[i + 1];
+  int nameLoopNum;
+  Variable *nameLoopVar = new Variable(0, "", "");
+  auto search = symbolsMaps->symbolTable.find(nameCon);
+  if (search != symbolsMaps->symbolTable.end()) {
+    *nameLoopVar = search->second;
+    nameLoopNum = nameLoopVar->getVar();
+  }
+  //save the sign of the loop
+  string signLoop = arrayStr[i + 2];
+  //save the number of the loop
+  int numberLoop = stoi(arrayStr[i + 3]);
+
+  if (signLoop == "<=") {
+    while (nameLoopNum <= numberLoop) {
+      for (varLoop k: arr) {
+        symbolsMaps->commandMap.find(k.nameVr)->second->execute(arrayStr,k.indexVr);
+      }
+    }
+  }
+  if (signLoop == "=>") {
+    while (nameLoopNum >= numberLoop) {
+      for (varLoop k: arr) {
+        symbolsMaps->commandMap.find(k.nameVr)->second->execute(arrayStr,k.indexVr);
+      }
+    }
+  }
+  if (signLoop == "<") {
+    while (nameLoopNum < numberLoop) {
+      for (varLoop k: arr) {
+        symbolsMaps->commandMap.find(k.nameVr)->second->execute(arrayStr,k.indexVr);
+      }
+    }
+  }
+  if (signLoop == ">") {
+    while (nameLoopNum > numberLoop) {
+      for (varLoop k: arr) {
+        symbolsMaps->commandMap.find(k.nameVr)->second->execute(arrayStr,k.indexVr);
+      }
+    }
+  }
+  if (signLoop == "==") {
+    while (nameLoopNum == numberLoop) {
+      for (varLoop k: arr) {
+        symbolsMaps->commandMap.find(k.nameVr)->second->execute(arrayStr,k.indexVr);
+      }
+    }
+  }
+  if (signLoop == "!=") {
+    while (nameLoopNum != numberLoop) {
+      for (varLoop k: arr) {
+        symbolsMaps->commandMap.find(k.nameVr)->second->execute(arrayStr,k.indexVr);
+      }
+    }
+  }
+  return num;
 }
 //destructor
 loopCommand::~loopCommand() {};
