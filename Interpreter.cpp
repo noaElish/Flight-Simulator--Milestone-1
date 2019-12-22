@@ -192,13 +192,15 @@ Variable::Variable(float value, string sim, string direction)
 void Variable::updateValue(float num) {
   value = num;
 }
-//this method return the direction of variable
+//return the direction of a certain variable
 string Variable::getDir() {
   return this->direction;
 }
+//return the sim path of a certain variable
 string Variable::getSim() {
   return this->sim;
 }
+//return the numeric value of a certain variable
 float Variable::getVar() {
   return this->value;
 }
@@ -212,36 +214,44 @@ Variable::~Variable() {};
 /* Null, because instance will be initialized on demand. */
 SymbolTable *SymbolTable::instance = 0;
 
+//return instance for the map
 SymbolTable *SymbolTable::getInstance() {
   if (instance == 0) {
     instance = new SymbolTable();
   }
   return instance;
 }
+
 //constructor - It is in the private area so objects cannot be created from outside.
 SymbolTable::SymbolTable() {};
 SymbolTable *symbolsMaps = symbolsMaps->getInstance();
 SymbolTable *simMap = symbolsMaps->getInstance();
+
+//insert value to the command map
 void SymbolTable::intilizationCommandMap(vector<string> splittedStrings) {
   map<string, Command *> commandMap;
   Interpreter i;
   commandMap = i.intoCommandMap(splittedStrings, commandMap);
 }
 
+//update a certain value in the symbol map
 void SymbolTable::upDateSymbolTable(string nameVar, Variable var) {
   instance->symbolTable.insert({nameVar, var});
 }
 
+//return the variable of a certain key in the symbol map
 Variable SymbolTable::getVariable(string name) {
   symbolsMaps->symbolTable.find(name);
 }
 
+//insert new value to sim map
 void SymbolTable::putInSimMap(int i, float num) {
   SymbolTable *instance = SymbolTable::getInstance();
   string simString = symbolsMaps->SetArrayOfSim(i);
   instance->simMap.insert({simString, num});
 }
 
+//get the value of a certain sim in the sim map
 float SymbolTable::getValueFromSim(string sim) {
   float returnIt;
   auto search = simMap.find(sim);
@@ -251,6 +261,7 @@ float SymbolTable::getValueFromSim(string sim) {
   return returnIt;
 }
 
+//create array of sim paths
 string SymbolTable::SetArrayOfSim(int i) {
   string arrSim[36];
   arrSim[0] = "/instrumentation/airspeed-indicator/indicated-speed-kt";
