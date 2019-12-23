@@ -1,10 +1,5 @@
-//
-// Created by shira on 19.12.2019.
-//
-
 #ifndef EX3PROJECT_COMMAND_H
 #define EX3PROJECT_COMMAND_H
-
 #include <thread>
 #include <iostream>
 #include <string.h>
@@ -20,8 +15,6 @@
 #include <arpa/inet.h>
 using namespace std;
 
-
-
 /**
  * command Interface
  */
@@ -31,7 +24,6 @@ public:
     //destructor
     virtual ~Command(){};
 };
-
 
 /**
  * Class for OpenServerCommand
@@ -59,7 +51,7 @@ public:
     //constructor
     ConnectCommand();
     int execute(vector<string> arrayStr, int i);
-  //  void connectControlClient(string adressConnect, int port);
+    //  void connectControlClient(string adressConnect, int port);
     //destructor
     ~ConnectCommand();
 };

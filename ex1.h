@@ -1,110 +1,131 @@
 //
-// Created by noa on 06/11/2019.
+// Created by shira on 21.11.2019.
 //
 
+#ifndef UNTITLED1_EX1_H
+#define UNTITLED1_EX1_H
 
+
+
+#ifndef PROJECT_EX1_H
+#define PROJECT_EX1_H
 #include "Expression.h"
-#include <iostream>
-#include <string>
+#include <queue>
 #include <map>
 
-#ifndef EX1_EX1_H
-#define EX1_EX1_H
-
-class Value : public Expression {
-  const double value;
- public:
-  Value(double v);
-  double calculate();
+using namespace std;
+class Value : public Expression
+{
+protected:
+    double value;
+public:
+    Value(double value);
+    double calculate();
+    ~Value();
 };
-class var : public Expression {
-  string name;
-  double value;
- public:
-  var(string nameOfVer, double valueOfVer);
-  double calculate();
-  //~Variable();
-
-  var &operator++();
-
-  var &operator--();
-
-  var &operator+=(double number);
-
-  var &operator-=(double number);
-
-  var &operator++(int number);
-
-  var &operator--(int number);
+class Var : public Expression
+{
+protected:
+    double value;
+    char* name;
+public:
+    Var(string name, double variable);
+    void inputValidValue(string nameValue);
+    double calculate();
+    Var& operator++();
+    Var& operator--();
+    Var& operator+=(double num);
+    Var& operator-=(double num);
+    Var& operator++(int num);
+    Var& operator--(int num);
+    ~Var();
 };
-
-class BinaryOperation :public Expression{
- protected:
-  Expression *rightExp;
-  Expression *leftExp;
- public:
-  BinaryOperation(Expression *exp1, Expression *exp2);
-  ~BinaryOperation();
+class UnaryOperator : virtual public Expression {
+protected:
+    Expression* expression;
+public:
+    UnaryOperator(Expression* const expression = 0);
+    double calculate();
+    ~UnaryOperator();
 };
-
-class UnaryExpression :public Expression{
- protected:
-  Expression *exp;
- public:
-  UnaryExpression(Expression *exp1);
-  ~UnaryExpression();
+class UPlus : virtual public UnaryOperator {
+protected:
+    Expression *expression;
+public:
+    UPlus(Expression *expression);
+    double calculate();
+    ~UPlus();
 };
-
-class Minus : public BinaryOperation {
- public:
-  Minus(Expression *exp11, Expression *exp21);
-  double calculate();
+class UMinus : virtual public UnaryOperator {
+protected:
+    Expression *expression;
+public:
+    UMinus(Expression *expression);
+    double calculate();
+    ~UMinus();
 };
-
-class Plus : public BinaryOperation {
- public:
-  Plus(Expression *exp11, Expression *exp21);
-  double calculate();
+class BinaryOperator : virtual public Expression {
+protected:
+    Expression* leftExpression;
+    Expression* rightExpression;
+public:
+    BinaryOperator(Expression* const leftExpression = 0, Expression* const rightExpression = 0);
+    double calculate();
+    ~BinaryOperator();
 };
-
-class Mul : public BinaryOperation {
- public:
-  Mul(Expression *exp11, Expression *exp21);
-  double calculate();
+class Plus : virtual public BinaryOperator {
+protected:
+    Expression* leftExpression;
+    Expression* rightExpression;
+public:
+    Plus(Expression* leftExpression, Expression* rightExpression);
+    double calculate();
+    ~Plus();
 };
-
-class Div : public BinaryOperation {
- public:
-  Div(Expression *exp11, Expression *exp21);
-  double calculate();
+class Minus : virtual public BinaryOperator {
+protected:
+    Expression* leftExpression;
+    Expression* rightExpression;
+public:
+    Minus(Expression* leftExpression, Expression* rightExpression);
+    double calculate();
+    ~Minus();
 };
-
-class UPlus : public UnaryExpression {
- public:
-  UPlus(Expression *exp1);
-  //calculate
-  double calculate();
+class Mul : virtual public BinaryOperator {
+protected:
+    Expression* leftExpression;
+    Expression* rightExpression;
+public:
+    Mul(Expression* leftExpression, Expression* rightExpression);
+    double calculate();
+    ~Mul();
 };
-
-class UMinus : public UnaryExpression {
- public:
-  UMinus(Expression *exp11);
-  //calculate
-  double calculate();
+class Div : virtual public BinaryOperator {
+protected:
+    Expression* leftExpression;
+    Expression* rightExpression;
+public:
+    Div(Expression* leftExpression, Expression* rightExpression);
+    double calculate();
+    ~Div();
 };
 
 class Inter {
- public:
-  char *saveStr;
-  map<string, double > mapVar;
-  Expression *toInsert;
-  Expression *one;
-  Expression *two;
-  Expression *newExp;
-  Inter();
-  Expression *interpret(string toExp);
-  void setVariables(string set);
+public:
+    map<string, double> variable;
+    Inter();
+    Expression* interpret(string str);
+    queue<string> strToQueue(string str);
+    Expression* creatExpression(queue<string> operands);
+    void setVariables(string str);
+    double intFromString(string str);
+    bool operatorPrecedence(char currentOperator, char topStackOperator);
+    void inputValidVariable(string nameValue);
+    void inputValidNum(string num);
+    ~Inter();
 };
 
+#endif //PROJECT_EXPRESSION_H
+#pragma once
 
-#endif //EX1_EX1_H
+#endif //UNTITLED1_EX1_H

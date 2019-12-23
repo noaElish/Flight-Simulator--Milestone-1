@@ -1,3 +1,4 @@
+
 //
 // Created by shira on 19.12.2019.
 //
@@ -6,7 +7,7 @@
 #define EX3PROJECT_INTERPRETER_H
 
 
-#include "../Command.h"
+#include "Command.h"
 
 #include <thread>
 #include <iostream>
@@ -59,10 +60,10 @@ public:
     Variable(float value, string sim, string direction);
     void updateValue(float num);
     string getDir();
-      string getSim();
-  float getVar();
+    string getSim();
+    float getVar();
 
-    
+
     //constructor
     ~Variable();
 };

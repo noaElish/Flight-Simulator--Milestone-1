@@ -1,430 +1,589 @@
-//
-// Created by noa elishmereni on 06/11/2019.
-//
 
-#include "ex1.h"
-#include "Expression.h"
+
 #include <iostream>
-#include <string>
-#include <queue>
 #include <stack>
+#include <queue>
 #include <map>
-#include "regex"
-#include "Interpreter.h"
+#include <string.h>
+#include <stdio.h>
 using namespace std;
+#include "ex1.h"
 
-/*this function define class value
- * */
-//constructor
-Value::Value(double v) : value(v) {
-}
-//return the integer of value
+// Constructor for Value
+Value::Value(double val)
+        :value(val)
+{}
+//This method return value
 double Value::calculate() {
-  return (value);
+    return this->value;
 }
-
-/*this function define class variable
- * */
-//constructor
-var::var(string nameOfVer, double valueOfVer) {
-  /*this->name = new char[strlen(nameOfVer) + 1];
-  strcpy(this->name, nameOfVer);*/
-  this->name = nameOfVer;
-  this->value = valueOfVer;
-}
-//return the integer of value
-double var::calculate() {
-  double copy= value;
-  return copy;
-}
-
-//return the ++value
-var &var::operator++() {
-  ++this->value;
-  return *this;
-}
-//return the --value
-var &var::operator--() {
-  --this->value;
-  return *this;
-}
-//return the value+double
-var &var::operator+=(double number) {
-  this->value = this->value + number;
-  return *this;
-}
-//return the value-double
-var &var::operator-=(double number) {
-  this->value = this->value - number;
-  return *this;
-}
-//return the value++
-var &var::operator++(int) {
-  this->value++;
-  return *this;
-}
-//return the value--
-var &var::operator--(int) {
-  this->value--;
-  return *this;
-}
-
-
-//constroctor
-BinaryOperation::BinaryOperation(Expression *exp1, Expression *exp2) {
-  this->leftExp = exp1;
-  this->rightExp = exp2;
-}
-//destroctor
-BinaryOperation::~BinaryOperation() {
-  delete (rightExp);
-  delete (leftExp);
-}
-
-UnaryExpression::UnaryExpression(Expression *exp1) {
-  this->exp = exp1;
-}
-UnaryExpression::~UnaryExpression() {
-  delete (exp);
-}
-
-
-//constructor*/
-Minus::Minus(Expression *exp11, Expression *exp21) : BinaryOperation(exp11, exp21) {
-}
-//calculate
-double Minus::calculate() {
-  return (leftExp->calculate() - rightExp->calculate());
-}
-
-//constructor
-Plus::Plus(Expression *exp11, Expression *exp21) : BinaryOperation(exp11, exp21) {
-
-}
-//calculate
-double Plus::calculate() {
-  return (leftExp->calculate() + rightExp->calculate());
-}
-
-
-//constructor
-Mul::Mul(Expression *exp11, Expression *exp21) : BinaryOperation(exp11, exp21) {
-}
-//calculate
-double Mul::calculate() {
-  return (leftExp->calculate() * rightExp->calculate());
-}
-
-//constructor
-Div::Div(Expression *exp11, Expression *exp21) : BinaryOperation(exp11, exp21) {
-}
-//calculate
-double Div::calculate() {
-  if (rightExp->calculate() == 0) {
-    throw "error- division in zero";
-  }
-  return (leftExp->calculate() / rightExp->calculate());
-}
-//constructor*/
-UPlus::UPlus(Expression *exp1) : UnaryExpression(exp1) {
-}
-//calculate
-double UPlus::calculate() {
-  return (exp->calculate());
-}
-
-//constructor
-UMinus::UMinus(Expression *exp1) : UnaryExpression(exp1) {
-
-}
-//calculate
-double UMinus::calculate() {
-  return (-1 * exp->calculate());
-}
-
-
-//variables for the method
-char *saveStr;
-//map<string, double> mapVar;
-queue<string> expHolder;
-stack<char> operHolder;
-stack<Expression *> expressionStack;
-Expression *toInsert;
-Expression *one;
-Expression *two;
-Expression *newExp;
-
-//the constructor of the class
-Inter::Inter() {
-}
-
-//this method change a string to expression
-//Expression *interpret(string toExp) {
-Expression* Inter::interpret(string toExp) {
-  SymbolTable *instance = instance->getInstance();
-  //loop that goes over the string
-  for (unsigned int i = 0; i < toExp.length(); i++) {
-
-    //if there is space somewhere in the string
-    if (toExp[i] == ' ') {
-      continue;
+//Destructor for Value
+Value::~Value()
+{}
+// Constructor for Variable
+Var::Var(string nameStr, double val)
+        :value(val)
+{
+    this->name = new char[nameStr.length() + 1];
+    try
+    {
+        inputValidValue(nameStr);
     }
-
-      //if the char is '('
-    else if (toExp[i] == '(') {
-      operHolder.push(toExp[i]);
+    catch (const char* e) {
+        std::cout << e << std::endl;
     }
+}
 
-      //if the char is ")"
-    else if (toExp[i] == ')') {
-      string saveOperator;
-      //move all the operator until you reach "("
-      while (operHolder.top() != '(') {
-        //save the top operator
-        saveOperator = operHolder.top();
-        //move the operator to the queue
-        expHolder.push(saveOperator);
-        operHolder.pop();
-      }
+void Var::inputValidValue(string nameValue)
+{
+    //check that the name was good
+    if (!(((nameValue[0] >= 65) && (nameValue[0] <= 90)) || ((nameValue[0] >= 97) && (nameValue[0] <= 122)) || (nameValue[0] == '_')))
+    {
+        throw "bad input";
     }
-
-      //if the char is a number
-    else if (isdigit(toExp[i])) {
-      //loop to check how big the number is
-      string saveNum;
-      saveNum = toExp[i];
-      //while it is still a digit, count by one
-      while ((isdigit(toExp[i + 1]) || (toExp[i + 1] == '.'))) {
-        saveNum = saveNum + toExp[i + 1];
-        i++;
-      }
-      //push the number to the queue
-      expHolder.push(saveNum);
+    int k = 1;
+    while (nameValue[k] != '\0')
+    {
+        //cout << nameValue[k];
+        if (!(((nameValue[k] >= 65) && (nameValue[k] <= 90)) || (((nameValue[k] >= 97) && (nameValue[k] <= 122)))
+              || (((nameValue[k] >= 48) && (nameValue[k] <= 57))) || (nameValue[k] == '_')))
+        {
+            cout << nameValue[k];
+            throw "bad input";
+        }
+        k++;
     }
+}
 
-      //if the char is operator
+//This method return value
+double Var::calculate() {
+    return this->value;
+}
+//op++ method
+Var& Var::operator++(){
+    this->value = this->value + 1;
+    return *this;
+}
+//op-- method
+Var& Var::operator--(){
+    this->value = this->value - 1;
+    return *this;
+}
+//op+= method
+Var& Var::operator+=(double num){
+    this->value = this->value + num;
+    return *this;
+}
+//op-= method
+Var& Var::operator-=(double num){
+    this->value = this->value - num;
+    return *this;
+}
+//op++ method
+Var& Var::operator++(int){
+    this->value = this->value + 1;
+    return *this;
+}
+//op-- method
+Var& Var::operator--(int){
+    this->value = this->value - 1;
+    return *this;
+}
+//Destructor for Variable
+Var::~Var() {
+    delete []name;
+    //cout << "Variable object deleted!!!" << endl;
+}
+
+
+//Constractor for UnaryOperator class
+UnaryOperator::UnaryOperator(Expression* exp)
+        : expression(exp)
+{}
+double UnaryOperator::calculate()
+{
+    return 0;
+}
+//Destructor for UnaryOperator class
+UnaryOperator::~UnaryOperator() {
+}
+//Constractor for UPlus class
+UPlus::UPlus(Expression* exp)
+        : expression(exp)
+{}
+//this method calculate the expression
+double UPlus::calculate()
+{
+    return  expression->calculate();
+}
+//Constractor for UPlus class
+UPlus::~UPlus() {
+    delete[]expression;
+}
+//Constractor for UMinus class
+UMinus::UMinus(Expression *exp)
+        : expression(exp)
+{}
+//this method calculate the expression
+double UMinus::calculate()
+{
+    return -1 * expression->calculate();
+}
+//Destructor for UMinus class
+UMinus::~UMinus() {
+    //delete[]expression;
+}
+//Constractor for BinaryOperator class
+BinaryOperator::BinaryOperator(Expression* left, Expression* right)
+        : leftExpression(left), rightExpression(right)
+{}
+//this method calculate the expression
+double BinaryOperator::calculate()
+{
+    return 0;
+}
+//Destructor for BinaryOperator class
+BinaryOperator::~BinaryOperator() {
+    delete[]leftExpression;
+    delete[]rightExpression;
+}
+//Constractor for Plus class
+Plus::Plus(Expression* left, Expression* right)
+        : leftExpression(left), rightExpression(right)
+{}
+//this method calculate the expression
+double Plus::calculate()
+{
+    return (leftExpression->calculate() + rightExpression->calculate());
+}
+//Destructor for Plus class
+Plus::~Plus() {}
+//Constractor for Minus class
+Minus::Minus(Expression* left, Expression* right)
+        : leftExpression(left), rightExpression(right)
+{}
+//this method calculate the expression
+double Minus::calculate()
+{
+    return (leftExpression->calculate() - rightExpression->calculate());
+}
+//Destructor for Minus class
+Minus::~Minus() {}
+//Constractor for Mul class
+Mul::Mul(Expression* left, Expression* right)
+        : leftExpression(left), rightExpression(right)
+{}
+//this method calculate the expression
+double Mul::calculate()
+{
+    return (leftExpression->calculate() * rightExpression->calculate());
+}
+//Destructor for Mul class
+Mul::~Mul()
+{}
+//Constractor for Div class
+Div::Div(Expression* left, Expression* right)
+        : leftExpression(left), rightExpression(right)
+{}
+//this method calculate the expression
+double Div::calculate()
+{
+    //dividing in zero was not valid
+    if (rightExpression->calculate() != 0) {
+        return (leftExpression->calculate() / rightExpression->calculate());
+    }
     else {
-      //if the operator is a variable
-      if ((toExp[i] != '+') && (toExp[i] != '/') && (toExp[i] != '-') && (toExp[i] != '*')) {
-        int countOne = 0;
-        int copyI = i;
-        std::string strinOperat;
-        //checking if the variable name is longer then one char
-        while ((toExp[copyI + 1] != '(') && (toExp[copyI + 1] != ')') && (toExp[copyI + 1] != '-')
-            && (toExp[copyI + 1] != '+') && (toExp[copyI + 1] != '/') && (toExp[copyI + 1] != '*')) {
-          countOne++;
-          copyI++;
-        }
-        //if it is longer- save the given name
-        if (countOne != 0) {
-          strinOperat = toExp.substr(i, countOne + 1);
-          i = i + countOne;
-        }
-          //if it is only one char
-        else {
-          strinOperat.push_back(toExp[i]);
-        }
-        //save the variable name
-        expHolder.push(strinOperat);
-        continue;
-        //if it is an operator
-      } else {
-        //if its an operator, and its two operators one after another, throw exception
-        if (toExp[i + 1] == toExp[i]) {
-          throw "error";
-        }
-        //if the stack is empty
-        if (operHolder.empty()) {
-          //the stack is empty- and the first operator to enter is unary minus
-          if (toExp[i] == '-') {
-            if (i == 0) {
-              //creating unique sign for the unary minus
-              operHolder.push('$');
-            } else {
-              operHolder.push(toExp[i]);
-            }
-          } else {
-            operHolder.push(toExp[i]);
-          }
-        }
-
-          //if the stack isn't empty
-        else {
-          //compare the operator on the top
-          char saveToCompare = operHolder.top();
-          //if the operator is higher then the one on the top
-          if (saveToCompare >= toExp[i]) {
-            while (operHolder.top() != '(') {
-              saveToCompare = operHolder.top();
-              //move the operator to the queue
-              std::string strinOperat = std::to_string(saveToCompare);
-              expHolder.push(strinOperat);
-              operHolder.pop();
-            }
-            //inserting the new operator
-            if (toExp[i] == '-') {
-              if (isdigit(toExp[i - 1])) {
-                //creating unique sign for the unary minus
-                operHolder.push('$');
-              }
-            } else {
-              operHolder.push(toExp[i]);
-            }
-          }
-            //if the operator is lower then the one on the top
-          else {
-            if (toExp[i] == '-') {
-              if (((!isdigit(toExp[i - 1])) && (!isdigit(toExp[i + 1])))
-                  || ((toExp[i + 1] != '(') && (toExp[i - 1] != ')'))) {
-                //creating unique sign for the unary minus
-                operHolder.push('$');
-              } else {
-                operHolder.push(toExp[i]);
-              }
-            } else {
-              operHolder.push(toExp[i]);
-            }
-          }
-        }
-      }
+        throw "Divid by zero";
     }
-  }
+}
+//Destructor for Div class
+Div::~Div()
+{}
 
-  //after you finish going over the string, move all that's left in the stack to the queue
-  while (!operHolder.empty()) {
-    char save = operHolder.top();
-    //if the operator is "(", dont pass and and continue
-    if (save == '(') {
-      operHolder.pop();
-      continue;
-      //if its a regular operator- pass it to queue
-    } else {
-      string moveToQueue;
-      moveToQueue.push_back(save);
-      expHolder.push(moveToQueue);
-      operHolder.pop();
-    }
-  }
 
-  //after the queue is ready- make a new expression from the string
-  //search two numbers and an operator and make an expression from it
-  double valueSave;
-  string charSave;
-  while (!expHolder.empty()) {
-    //take out the numbers until you reach an operator
-    while ((expHolder.front() != "+") && (expHolder.front() != "-") && (expHolder.front() != "/")
-        && (expHolder.front() != "*") && (expHolder.front() != "$")) {
-      //if this is a variable
-      if (instance->symbolTable.count(expHolder.front())) {
-        charSave = expHolder.front();
-        //find the value in the map
-        Variable check = instance->symbolTable.at(charSave);
 
-        valueSave = check.getVar();
-        //create new expression of variable
-        toInsert = new var(charSave, valueSave);
-      } else {
-        toInsert = new Value(std::stod(expHolder.front()));
-      }
-      expressionStack.push(toInsert);
-      expHolder.pop();
-    }
+//part two of homework
 
-    //there is an operator in the string, take it and create new expression together with the last two values
-    //save the last two values
-    //if its $ sign- make only one expression
-    if (expHolder.front() == "$") {
-      one = expressionStack.top();
-      expressionStack.pop();
-      newExp = new UMinus(one);
-      expressionStack.push(newExp);
-      expHolder.pop();
-    } else {
-      if (expressionStack.size() >= 2) {
-        one = expressionStack.top();
-        expressionStack.pop();
-        two = expressionStack.top();
-        expressionStack.pop();
-        //if there is only one expression on the top of the stack, but the operator isnt unary- exception
-      } else {
-        try {
-          throw 1;
-        }
-        catch (int i) {
-          std::cout << "error- not enough elements";
-          break;
-        }
-      }
-      //for each operator- save the matching expression
-      if (expHolder.front() == "+") {
-        newExp = new Plus(two, one);
-        expressionStack.push(newExp);
-      }
-      if (expHolder.front() == "-") {
-        newExp = new Minus(two, one);
-        expressionStack.push(newExp);
-
-      }
-      if (expHolder.front() == "/") {
-        newExp = new Div(two, one);
-        expressionStack.push(newExp);
-      }
-      if (expHolder.front() == "*") {
-        newExp = new Mul(two, one);
-        expressionStack.push(newExp);
-
-      }
-      expHolder.pop();
-    }
-  }
-  //return the full expression
-  return expressionStack.top();
+//Constractor for Interpreter class
+Inter::Inter()
+{}
+//Destructor for Interpreter class
+Inter::~Inter() {}
+//This method accepts intfix phrase and return expression that represents it
+Expression* Inter::interpret(string str)
+{
+    //pueue with all numbers, variabels and operators in expression
+    queue <string> operands = strToQueue(str);
+    //The final expression
+    Expression* exp = creatExpression(operands);
+    return exp;
 }
 
-void Inter::setVariables(string stringA) {
-  double doubSave;
-  unsigned int j = 0;
-  int p = 0;
-  string charSave;
-  regex regexCheck("((\\+|-)?[[:digit:]]+)(\\.(([[:digit:]]+)))?");
-  SymbolTable *instance = instance->getInstance();
-
-
-  for (unsigned int i = 0; i < stringA.length(); i++) {
-    if (stringA[i] == '=') {
-      int count = 0;
-      j = i;
-      p = i;
-      //count the number of chars to take from the string
-      while ((stringA[p - 1] != ';') && (p > 0)) {
-        p--;
-        count++;
-      }
-      //save the name
-      charSave = stringA.substr(p, count);
-
-      count = 0;
-      //count the number of chars to take from the string
-      while ((j < stringA.length() - 1) && (stringA[j + 1] != ';')) {
-        j++;
-        count++;
-      }
-      //check if its a number
-      if (regex_match(stringA.substr(i + 1, count), regexCheck)) {
-        //if there are no problem with the expression, save to map
-        doubSave = std::stod(stringA.substr(i + 1, count));
-        if (instance->symbolTable.find(charSave) == instance->symbolTable.end()) {
-          Variable check = instance->symbolTable.at(charSave);
-          instance->symbolTable.insert(pair<string, Variable>(charSave, check));
-        } else {
-          instance->symbolTable.erase(charSave);
-          Variable check = instance->symbolTable.at(charSave);
-          instance->symbolTable.insert(pair<string, Variable>(charSave, check));
+//This method put all operands and operators from string expression in queue
+queue<string> Inter::strToQueue(string str)
+{
+    //stack for all operators in expression
+    stack <char> operators;
+    //queue for all operators and operands in expression
+    queue <string> operands;
+    int countOpen = 0;
+    int countClose = 0;
+    for (size_t i = 0; i < str.length(); i++)
+    {
+        if (str[i] == ' ')
+        {
+            continue;
         }
-      } else {
-        throw "error regex";
-      }
-    }
-  }
-}
+        else if (str[i] == '(')
+        {
+            //if it left paren push it onto the operator stack.
+            operators.push(str[i]);
+            countOpen++;
+        }
+        else if (str[i] == '*' || str[i] == '/' || str[i] == '+' || str[i] == '-')
+        {
+            if (str[i+1] == '*' || str[i+1] == '/' || str[i+1] == '+' || str[i+1] == '-')
+            {
+                throw "illegal math expression";
+            }
+            /*
+                if there is an operator at the top of the operator stack with greater precedence
+                or equal -> pop operators from the operator stack onto the output queue.
+            */
+            if (!operators.empty())
+            {
+                while ((operatorPrecedence(str[i], operators.top())) || (operators.top() != '('))
+                {
+                    string s(1, operators.top());
+                    operands.push(s);
+                    operators.pop();
+                    if (operators.empty())
+                    {
+                        break;
+                    }
+                }
 
+            }
+            //push it onto the operator stack.
+            operators.push(str[i]);
+        }
+        else if (str[i] == ')')
+        {
+            countClose++;
+            //while the operator at the top of the operator stack is not a left paren
+            while ( !operators.empty())
+            {
+                if (operators.top() != '(')
+                {
+                    //pop the operator from the operator stack onto the output queue.
+                    string s(1, operators.top());
+                    operands.push(s);
+                    operators.pop();
+                }
+                else {
+                    operators.pop();
+                    if (operators.top() == '(')
+                    {
+                        break;
+                    }
+                }
+            }
+        }
+        else
+        {
+            int t=i;
+            while ((str[t] != '(') && (str[t] != ')') && (str[t] != '+') && (str[t] != '*') &&
+                   (str[t] != '/') && (str[t] != '-') && ((unsigned)t < str.length()))
+            {
+                t++;
+            }
+            string sub = str.substr(i, t-i);
+            //is digit or operand
+            i = t-1;
+            operands.push(sub);
+        }
+    }
+    while (!operators.empty())
+    {
+        string s(1, operators.top());
+        operands.push(s);
+        operators.pop();
+    }
+
+    if (countClose != countOpen) {
+        throw "bad input";
+    }
+    //return the queue
+    return operands;
+}
+//This methos create expression from queue
+Expression* Inter::creatExpression(queue <string> operands)
+{
+    stack <Expression*> stackExpression;
+    string s;
+    // while in the steck have more one expression
+    while (!operands.empty())
+    {
+        // s = the first string in queue
+        s = operands.front();
+        operands.pop();
+        // if the first string in queue was operator -> need to calculate him with two previous expression
+        if ((s[0] == '*') || (s[0] == '/') || (s[0] == '+') || (s[0] == '-'))
+        {
+            if (!operands.empty())
+            {
+                string s2 = operands.front();
+                if ((s[0] == '-') && (s2[0] == '+'))
+                {
+                    operands.pop();
+                    s[0] = '-';
+                }
+                else if ((s[0] == '+') && (s2[0] == '+'))
+                {
+                    operands.pop();
+                    s[0] = '+';
+                }
+            }
+            if (stackExpression.size() == 1)
+            {
+                Expression* e = stackExpression.top();
+                stackExpression.pop();
+                Expression* unary;
+                if (s[0] == '+')
+                {
+                    unary = new UPlus(e);
+                }
+                else if (s[0] == '-')
+                {
+                    unary = new UMinus(e);
+                }
+                else if ((s[0] == '*') || (s[0] == '/'))
+                {
+                    return e;
+                }
+                stackExpression.push(unary);
+            }
+            else
+            {
+                if (s[0] == '-')
+                {
+                    Expression* e = stackExpression.top();
+                    stackExpression.pop();
+                    Expression* unary = new UMinus(e);
+                    stackExpression.push(unary);
+                    s = operands.front();
+                    operands.pop();
+                }
+                Expression* e1 = stackExpression.top();
+                stackExpression.pop();
+                Expression* e2 = stackExpression.top();
+                stackExpression.pop();
+                Expression* result;
+                if (s[0] == '*')
+                {
+                    result = new Mul(e2, e1);
+                }
+                else if (s[0] == '/')
+                {
+                    result = new Div(e2, e1);
+                }
+                else if (s[0] == '+')
+                {
+                    result = new Plus(e2, e1);
+                }
+                else if (s[0] == '-')
+                {
+                    result = new Minus(e2, e1);
+                }
+                stackExpression.push(result);
+            }
+        }
+        else {
+            string nextTop = operands.front();
+            if (nextTop[0] == '-')
+            {
+                operands.pop();
+                double num = intFromString(s);
+                Expression* e2 = new UMinus(new Value(num));
+                stackExpression.push(e2);
+            }
+            else
+            {
+                double num = intFromString(s);
+                Expression* e = new Value(num);
+                stackExpression.push(e);
+            }
+        }
+    }
+    if ((operands.empty()) && (stackExpression.size() == 2))
+    {
+        Expression* e1 = stackExpression.top();
+        stackExpression.pop();
+        Expression* e2 = stackExpression.top();
+        stackExpression.pop();
+        Expression* result = new Mul(e1, e2);
+        stackExpression.push(result);
+    }
+    //return stack that containing expression
+    return stackExpression.top();
+}
+//This func insert to map variabels that declared in Main
+void Inter::setVariables(string str)
+{
+    string nameValue;
+    double number;
+    int t = 0;
+    for (size_t i = 0; i < str.length(); i++)
+    {
+        //key in map
+        if (str[i] == '=')
+        {
+            string sub;
+            if (t == 0)
+            {
+                sub = str.substr(0, i);
+            }
+            else
+            {
+                sub = str.substr(t + 1, i - t - 1);
+            }
+            if (variable.count(sub) > 0)
+            {
+                variable.erase(sub);
+            }
+            t = i;
+            nameValue = sub;
+            //check that the name was good
+            inputValidVariable(nameValue);
+        }
+        //value in map
+        if ((str[i] == ';')||(i==str.length()-1))
+        {
+            string num;
+            if (i == str.length() - 1)
+            {
+                num = str.substr(t + 1, str.length() - 1);
+            }
+            else {
+                num = str.substr(t + 1, i - t - 1);
+            }
+            t = i;
+            inputValidNum(num);
+            number = atof(num.c_str());
+            variable.insert({ nameValue, number }); //insert to map
+        }
+    }
+}
+//This method check if this string was key in map.
+double Inter::intFromString(string str)
+{
+    double number;
+    if (variable.count(str)>0)
+    {
+        variable.find(str);
+        number = variable[str];
+    }
+    else
+    {
+        unsigned count=0;
+        for (unsigned i = 0; i < str.length(); i++)
+        {
+            if (((str[i] >= 48) && (str[i] <= 57)) || (str[i] == '.'))
+            {
+                count++;
+            }
+        }
+        if (count == str.length())
+        {
+            //if the string is not variable. is digit.
+            number = atof(str.c_str());
+        }
+        else
+        {
+            //interpret can contain variables that have not been set, throw an exception.
+            throw "bad input";
+        }
+    }
+    return number;
+}
+//This method accepts two oprerators and check if first was greater precedence from the second.
+bool Inter::operatorPrecedence(char currentOperator, char topStackOperator)
+{
+    if (currentOperator == '+')
+    {
+        if ((topStackOperator == '*') || (topStackOperator == '/') || (topStackOperator == '+'))
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+
+    } else if (currentOperator == '-')
+    {
+        if ((topStackOperator == '*') || (topStackOperator == '/') || (topStackOperator == '-'))
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+
+    }else if (currentOperator == '*')
+    {
+        if (topStackOperator == '*')
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+
+    }else
+    {
+        //if currentOperator == '/'
+        if (topStackOperator == '/')
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+}
+//throw exception if thr name of variable was not valid
+void Inter::inputValidVariable(string nameValue)
+{
+    //check that the name was good
+    if (!(((nameValue[0] >= 65) && (nameValue[0] <= 90)) || ((nameValue[0] >= 97) && (nameValue[0] <= 122)) || (nameValue[0] == '_')))
+    {
+        throw "bad input";
+    }
+    int k = 1;
+    while (nameValue[k] != '\0')
+    {
+        if (!(((nameValue[k] >= 65) && (nameValue[k] <= 90)) || ((nameValue[k] >= 97) && (nameValue[k] <= 122))
+              || ((nameValue[k] >= 0) && (nameValue[k] <= 9)) || (nameValue[k] == '_')))
+        {
+            throw "bad input";
+        }
+        k++;
+    }
+}
+//throw exception if thr value was not valid
+void Inter::inputValidNum(string num)
+{
+    int k = 0;
+    while (num[k] != '\0')
+    {
+        if (!(((num[k] >= 48) && (num[k] <= 57)) || (num[k] == '.')))
+        {
+            throw "bad input";
+        }
+        k++;
+    }
+}
