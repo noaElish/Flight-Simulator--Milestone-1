@@ -126,18 +126,36 @@ map<string, Command *> Interpreter::intoCommandMap(vector<string> splittedString
         } else if (key.compare("Sleep") == 0) {
             val = new Sleep();
             commandMap.insert({key, val});
-        } else if (key.compare("var") == 0) {              /**need to change this**/
-            key = splittedStrings[num + 1];
-            val = new DefineVarCommand();
-            commandMap.insert({key, val});
+       } else if (key.compare("var") == 0) {
+      /**need to change this**/
+      //check if there is "->\<-" or "="
+      if (splittedStrings[num+2]== "="){
+        //take the value of the second variable
+        Inter *i1 = new Inter();
+        Expression *next;                                                                      //////////////////////////////////////////
+       ////////////////// next = i1->interpret(splittedStrings[num + 4]);
+        float save= next->calculate();
 
-            Variable *var = new Variable(0, splittedStrings[num + 4], splittedStrings[num + 2]);
-            SymbolTable *symbolsMaps = symbolsMaps->getInstance();
-            symbolsMaps->upDateSymbolTable(splittedStrings[num + 1], *var);
-            /*
-            cout<<"var:  "<<var->getVar()<<endl;
-            cout<<"dir:  "<<var->getDir()<<endl;
-            cout<<"sim   "<<var->getSim()<<endl;
+        //create new var
+        val = new DefineVarCommand();
+        commandMap.insert({key, val});
+        Variable *var = new Variable(save, "", splittedStrings[num + 2]);
+        SymbolTable *symbolsMaps = symbolsMaps->getInstance();
+        symbolsMaps->upDateSymbolTable(splittedStrings[num + 1], *var);
+
+
+      } else{
+        key = splittedStrings[num + 1];
+        val = new DefineVarCommand();
+        commandMap.insert({key, val});
+        Variable *var = new Variable(0, splittedStrings[num + 4], splittedStrings[num + 2]);
+        SymbolTable *symbolsMaps = symbolsMaps->getInstance();
+        symbolsMaps->upDateSymbolTable(splittedStrings[num + 1], *var);
+      }
+      /*
+      cout<<"var:  "<<var->getVar()<<endl;
+      cout<<"dir:  "<<var->getDir()<<endl;
+      cout<<"sim   "<<var->getSim()<<endl;
 */
         } else if ((key.compare("while") == 0) || (key.compare("for") == 0) || (key.compare("if") == 0)) {
 
