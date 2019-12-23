@@ -8,7 +8,9 @@
 #include <stdio.h>
 using namespace std;
 #include "ex1.h"
+#include "Interpreter.h"
 
+SymbolTable *symbolTableMap = symbolTableMap->getInstance();
 // Constructor for Value
 Value::Value(double val)
         :value(val)
@@ -447,9 +449,9 @@ void Inter::setVariables(string str)
             {
                 sub = str.substr(t + 1, i - t - 1);
             }
-            if (variable.count(sub) > 0)
+            if (symbolTableMap->symbolTable.count(sub) > 0)
             {
-                variable.erase(sub);
+                symbolTableMap->symbolTable.erase(sub);
             }
             t = i;
             nameValue = sub;
@@ -470,7 +472,7 @@ void Inter::setVariables(string str)
             t = i;
             inputValidNum(num);
             number = atof(num.c_str());
-            variable.insert({ nameValue, number }); //insert to map
+            variable.insert({ nameValue, number }); //insert to map                                                 //////////////////////////////////////////////////////
         }
     }
 }
@@ -478,10 +480,11 @@ void Inter::setVariables(string str)
 double Inter::intFromString(string str)
 {
     double number;
-    if (variable.count(str)>0)
+    if (symbolTableMap->symbolTable.count(str)>0)
     {
-        variable.find(str);
-        number = variable[str];
+        symbolTableMap->symbolTable.find(str);
+        number = symbolTableMap->symbolTable.at(str).getVar();
+        //number = variable[str];                                                                                         ///////////???????????????
     }
     else
     {
