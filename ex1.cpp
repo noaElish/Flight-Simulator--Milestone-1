@@ -41,7 +41,7 @@ void Var::inputValidValue(string nameValue)
     //check that the name was good
     if (!(((nameValue[0] >= 65) && (nameValue[0] <= 90)) || ((nameValue[0] >= 97) && (nameValue[0] <= 122)) || (nameValue[0] == '_')))
     {
-        throw "bad input";
+        throw "bad input1";
     }
     int k = 1;
     while (nameValue[k] != '\0')
@@ -51,7 +51,7 @@ void Var::inputValidValue(string nameValue)
               || (((nameValue[k] >= 48) && (nameValue[k] <= 57))) || (nameValue[k] == '_')))
         {
             cout << nameValue[k];
-            throw "bad input";
+            throw "bad input2";
         }
         k++;
     }
@@ -224,6 +224,7 @@ Expression* Inter::interpret(string str)
 //This method put all operands and operators from string expression in queue
 queue<string> Inter::strToQueue(string str)
 {
+
     //stack for all operators in expression
     stack <char> operators;
     //queue for all operators and operands in expression
@@ -284,10 +285,13 @@ queue<string> Inter::strToQueue(string str)
                 }
                 else {
                     operators.pop();
+                    /*
                     if (operators.top() == '(')
                     {
+                        cout<<"@@@@@@8"<<endl;
                         break;
                     }
+                     */
                 }
             }
         }
@@ -305,6 +309,7 @@ queue<string> Inter::strToQueue(string str)
             operands.push(sub);
         }
     }
+
     while (!operators.empty())
     {
         string s(1, operators.top());
@@ -313,8 +318,12 @@ queue<string> Inter::strToQueue(string str)
     }
 
     if (countClose != countOpen) {
-        throw "bad input";
+        throw "bad input3";
     }
+
+
+
+
     //return the queue
     return operands;
 }
@@ -478,16 +487,13 @@ void Inter::setVariables(string str)
 }
 //This method check if this string was key in map.
 double Inter::intFromString(string str)
-{
-    double number;
+{    double number;
     if (symbolTableMap->symbolTable.count(str)>0)
     {
         symbolTableMap->symbolTable.find(str);
         number = symbolTableMap->symbolTable.at(str).getVar();
         //number = variable[str];                                                                                         ///////////???????????????
-    }
-    else
-    {
+    } else {
         unsigned count=0;
         for (unsigned i = 0; i < str.length(); i++)
         {
@@ -504,7 +510,7 @@ double Inter::intFromString(string str)
         else
         {
             //interpret can contain variables that have not been set, throw an exception.
-            throw "bad input";
+            throw "bad input4";
         }
     }
     return number;
@@ -564,7 +570,7 @@ void Inter::inputValidVariable(string nameValue)
     //check that the name was good
     if (!(((nameValue[0] >= 65) && (nameValue[0] <= 90)) || ((nameValue[0] >= 97) && (nameValue[0] <= 122)) || (nameValue[0] == '_')))
     {
-        throw "bad input";
+        throw "bad input5";
     }
     int k = 1;
     while (nameValue[k] != '\0')
@@ -572,7 +578,7 @@ void Inter::inputValidVariable(string nameValue)
         if (!(((nameValue[k] >= 65) && (nameValue[k] <= 90)) || ((nameValue[k] >= 97) && (nameValue[k] <= 122))
               || ((nameValue[k] >= 0) && (nameValue[k] <= 9)) || (nameValue[k] == '_')))
         {
-            throw "bad input";
+            throw "bad input6";
         }
         k++;
     }
@@ -585,7 +591,7 @@ void Inter::inputValidNum(string num)
     {
         if (!(((num[k] >= 48) && (num[k] <= 57)) || (num[k] == '.')))
         {
-            throw "bad input";
+            throw "bad input7";
         }
         k++;
     }

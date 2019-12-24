@@ -1,5 +1,7 @@
 
 #include "Interpreter.h"
+#include "Expression.h"
+#include "ex1.h"
 
 //constructor
 Interpreter::Interpreter() {};
@@ -126,37 +128,53 @@ map<string, Command *> Interpreter::intoCommandMap(vector<string> splittedString
         } else if (key.compare("Sleep") == 0) {
             val = new Sleep();
             commandMap.insert({key, val});
-       } else if (key.compare("var") == 0) {
-      /**need to change this**/
-      //check if there is "->\<-" or "="
-      if (splittedStrings[num+2]== "="){
-        //take the value of the second variable
-        Inter *i1 = new Inter();
-        Expression *next;                                                                      //////////////////////////////////////////
-       ////////////////// next = i1->interpret(splittedStrings[num + 4]);
-        float save= next->calculate();
+        } else if (key.compare("var") == 0) {              /**need to change this**/
+        /*
+            key = splittedStrings[num + 1];
+            val = new DefineVarCommand();
+            commandMap.insert({key, val});
 
-        //create new var
-        val = new DefineVarCommand();
-        commandMap.insert({key, val});
-        Variable *var = new Variable(save, "", splittedStrings[num + 2]);
-        SymbolTable *symbolsMaps = symbolsMaps->getInstance();
-        symbolsMaps->upDateSymbolTable(splittedStrings[num + 1], *var);
+            Variable *var = new Variable(0, splittedStrings[num + 4], splittedStrings[num + 2]);
+            SymbolTable *symbolsMaps = symbolsMaps->getInstance();
+            symbolsMaps->upDateSymbolTable(splittedStrings[num + 1], *var);
+            */
+
+            //check if there is "->\<-" or "="
+            if (splittedStrings[num+2]== "="){
+                //take the value of the second variable
+                Inter *i1 = new Inter();
+                Expression *next;                                                                      //////////////////////////////////////////
+
+                next = i1->interpret(splittedStrings[num + 3]);
+                cout<<"**"<<splittedStrings[num + 3]<<endl;
+//                cout<<"split3:   "<<splittedStrings[num+3]<<endl;
+                float save= next->calculate();
+                cout<<"save: "<<save<<endl;
+
+                //create new var
+                val = new DefineVarCommand();
+                commandMap.insert({key, val});
+                Variable *var = new Variable(save, "=", splittedStrings[num + 2]);
+                //Variable *var = new Variable(save, "", splittedStrings[num + 2]);
+                SymbolTable *symbolsMaps = symbolsMaps->getInstance();
+                symbolsMaps->upDateSymbolTable(splittedStrings[num + 1], *var);
+
+            } else{
+                key = splittedStrings[num + 1];
+                val = new DefineVarCommand();
+                commandMap.insert({key, val});
+                Variable *var = new Variable(0, splittedStrings[num + 4], splittedStrings[num + 2]);
+                SymbolTable *symbolsMaps = symbolsMaps->getInstance();
+                symbolsMaps->upDateSymbolTable(splittedStrings[num + 1], *var);
+            }
 
 
-      } else{
-        key = splittedStrings[num + 1];
-        val = new DefineVarCommand();
-        commandMap.insert({key, val});
-        Variable *var = new Variable(0, splittedStrings[num + 4], splittedStrings[num + 2]);
-        SymbolTable *symbolsMaps = symbolsMaps->getInstance();
-        symbolsMaps->upDateSymbolTable(splittedStrings[num + 1], *var);
-      }
-      /*
-      cout<<"var:  "<<var->getVar()<<endl;
-      cout<<"dir:  "<<var->getDir()<<endl;
-      cout<<"sim   "<<var->getSim()<<endl;
-*/
+
+            /*
+            cout<<"var:  "<<var->getVar()<<endl;
+            cout<<"dir:  "<<var->getDir()<<endl;
+            cout<<"sim   "<<var->getSim()<<endl;
+            */
         } else if ((key.compare("while") == 0) || (key.compare("for") == 0) || (key.compare("if") == 0)) {
 
             if ((key.compare("while") == 0) || (key.compare("for") == 0)) {
@@ -188,17 +206,34 @@ void Interpreter::parser(vector<string> splittedStrings) {
     Command *c;
     for (i = 0; i < splittedStrings.size(); i++) {
         if (commandMap.count(splittedStrings[i]) != 0) {
-            if ((i!=0)&&(splittedStrings[i-1]!="var")){
+            cout<<"sss: "<<splittedStrings[i]<<"   "<<splittedStrings[i+1]<<endl;
+            if ((i!=0)&&(splittedStrings[i-1]!="var")&&(splittedStrings[i]!="var")&&(splittedStrings[i-1]!="=")){
+                cout<<"1111"<<endl;
                 c = commandMap.find(splittedStrings[i])->second;
                 indexJump = c->execute(splittedStrings, i);
+                cout<<"2222"<<endl;
                 i = i + indexJump - 1;
             }
             if (i==0){
+                cout<<"33333"<<endl;
                 c = commandMap.find(splittedStrings[i])->second;
                 indexJump = c->execute(splittedStrings, i);
                 i = i + indexJump - 1;
             }
+        }
+        if ((splittedStrings[i-1]=="var")&&(splittedStrings[i+1]=="=")){
+            cout<<"4444444"<<endl;
 
+            commandMap.insert({splittedStrings[i],  new DefineVarCommand()});
+            Variable *var = new Variable(0, "=", splittedStrings[i + 2]);
+            SymbolTable *symbolsMaps = symbolsMaps->getInstance();
+            symbolsMaps->upDateSymbolTable(splittedStrings[i], *var);
+
+
+
+            c = commandMap.find(splittedStrings[i])->second;
+            indexJump = c->execute(splittedStrings, i);
+            i = i + indexJump - 1;
         }
     }
 }

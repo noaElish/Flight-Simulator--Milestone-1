@@ -169,7 +169,8 @@ int ConnectCommand::execute(vector<string> arrayStr, int i) {
     std::thread threadClient(connectControlClient, adress, port);
     threadClient.detach();
     //threadClient.join();
-    return 4;
+    //return 4;
+    return 2;
 }
 //destructor
 ConnectCommand::~ConnectCommand() {};
@@ -181,64 +182,30 @@ ConnectCommand::~ConnectCommand() {};
 //constructor
 DefineVarCommand::DefineVarCommand(){};
 int DefineVarCommand::execute(vector<string> arrayStr, int i) {
-    /*
-    float value = 3;
-    string sim = "p";
-    string direction = "o";
-    SymbolTable *symbolsMaps = symbolsMaps->getInstance();
-    Variable variable = new Variable(value,sim, direction);
-   // v= new Variable(3, "h", "o");
-    string d= "hh";
-    //symbolsMaps->symbolTable.insert(d, var);
-    symbolsMaps->putInSymbolTable(d,variable);
-    */
-
     cout << "in var def" << endl;
     /**need to change this func**///////////////////////////////////////////////////////////////////////
     index = i;
 
     SymbolTable *instance = instance->getInstance();
-    /*
-    cout<<"print map: "<<endl;
-    cout<<"size symbol table: "<<instance->symbolTable.size()<<endl;
-    for(auto it = instance->symbolTable.cbegin(); it != instance->symbolTable.cend(); ++it)
-    {
-        std::cout << it->first << " ***" << "\n";
-    }
-    cout<<"size sim map: "<<instance->simMap.size()<<endl;
-    for(auto it = instance->simMap.cbegin(); it != instance->simMap.cend(); ++it)
-    {
-        std::cout << it->first <<"  "<<it->second<< " ^^^" << "\n";
-    }
-    cout<<"       .....           "<<arrayStr[i+2];                                                                         //////////////////////////////////////////
-     */
-
-
-    //cout<<"saveName:   "<<arrayStr[i]<<endl;                                                                         //////////////////////////////////////////
-    string saveName = arrayStr[i];
-    //send the string after the "=" to expression
-    /*
-    Inter *i1 = new Inter();
-    Expression *next;
-    cout<<"arr:   "<<arrayStr[i+2]<<endl;                                                                         //////////////////////////////////////////
-    next = i1->interpret(arrayStr[i + 2]);
-     */
-
-    Inter *i1 = new Inter();
-    Expression *next;                                                                      //////////////////////////////////////////
-    next = i1->interpret(arrayStr[i + 2]);
-
-    //calculate the expression
-    double value = next->calculate();
-
-    cout<<"value:   "<<value<<endl;                                                                         //////////////////////////////////////////
     //check the direction
     Variable check = instance->symbolTable.at(arrayStr[i]);
-
-    cout<<"name:   "<<arrayStr[i]<<endl;                                                                         //////////////////////////////////////////
     string dir = check.getDir();
+    cout<<"dir:   "<<dir<<endl;
+    //////////////////////////////////////////
+    string saveName = arrayStr[i];
+    cout<<"saveName:  "<<saveName<<endl;
+    //send the string after the "=" to expression
+    Inter *i1 = new Inter();
+    Expression *next;                                                                      //////////////////////////////////////////
+    cout<<"string to interpreter:  "<<arrayStr[i+2]<<endl;
+    next = i1->interpret(arrayStr[i + 2]);
+    //calculate the expression
+    double value = next->calculate();
+    cout<<"value:   "<<value<<endl;
 
-    cout<<"dir:   "<<dir<<endl;                                                                         //////////////////////////////////////////
+
+
+
 
     //update the value in the first map
     if (dir == "->") {
@@ -264,6 +231,7 @@ int DefineVarCommand::execute(vector<string> arrayStr, int i) {
         string name= arrayStr[i];
         instance->symbolTable.insert({name,*insert});
     }
+    return 2;                                                                                   ///???????????????????????????????????/
 }
 //destructor
 DefineVarCommand::~DefineVarCommand() {};
