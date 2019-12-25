@@ -14,8 +14,9 @@
 #include <mutex>
 
 using namespace std;
-
+bool ifsleep = false;
 Interpreter inter;
+std::mutex mutuxConnect;
 
 //function of open Command
 int openDataServer(int port) {
@@ -56,7 +57,7 @@ int openDataServer(int port) {
 }
 std::mutex mutuxServer;
 void readFromServer(int acc) {
-
+    mutuxConnect.lock();
     //reading from the socket line by line-use loop-CHECK/////////////////
 
     //save each line to the data structure
@@ -103,6 +104,7 @@ void readFromServer(int acc) {
         }
         i = 0;
     }
+    mutuxConnect.unlock();
 }
 
 /**
@@ -137,7 +139,7 @@ OpenServerCommand::~OpenServerCommand() {};
  */
 ConnectCommand::ConnectCommand() {};
 
-std::mutex mutuxConnect;
+
 
 //function of connect Command
 void ConnectCommand::connectControlClient(string adressConnect, int port) {
@@ -157,17 +159,25 @@ void ConnectCommand::connectControlClient(string adressConnect, int port) {
     int connectUs = connect(socketClient, (struct sockaddr *) &addressSer, sizeof(addressSer));
     //check if connected
     if (connectUs == -1) {
-        std::cerr << "cant create socket" << std::endl;
+        std::cerr << "cant create socket" << std::endl<< std::flush;
     } else {
-        std::cerr << "connected to server" << std::endl;                        //need this??????????
+        std::cerr << "connected to server" << std::endl<< std::flush;                        //need this??????????
+        ifsleep= true;
     }
+
+
+
+
 
     //go over the maps and check if we need to send value to the simulator
     //create new mutux
     // std::mutex mutuxConnect;
 
+
+
     SymbolTable *instance = instance->getInstance();
     while (data_received != 1) {
+        mutuxConnect.lock();
         for (auto it: instance->symbolTable) {
             //check if the sign is "->"
             if ((it.second.getDir() == "->") && (it.second.getUpdate() == 1)) {
@@ -183,15 +193,18 @@ void ConnectCommand::connectControlClient(string adressConnect, int port) {
             }
 
         }
+        mutuxConnect.unlock();
     }
+
+
 
 
 }
 
 void ConnectCommand::sendToSimulator(string simPath, float value) {
     //set the string to sent to the simulator
-    int end = simPath.size() - 2;
-    string cutSim = simPath.substr(1, end);
+    int end = simPath.size() - 3;
+    string cutSim = simPath.substr(2, end);
     string toSim = "set " + cutSim + " " + to_string(value) + "\r\n";
     // string toSim = "set " + simPath + " " + to_string(value) + "\r\n";
     cout << "tosim:" << toSim << endl;
@@ -203,13 +216,17 @@ int ConnectCommand::execute(vector<string> arrayStr, int i) {
     cout << "in connect command" << endl;
 
     adress = arrayStr[i + 1];
+    int portCoommand= stoi(arrayStr[i + 2]);
+
     //port= 5402;
+    /*
     try {
         port = stoi(arrayStr[i + 2]);
     } catch (const std::exception &e) {
         cout << "problem with port in connect";
     }
-    std::thread threadClient(&ConnectCommand::connectControlClient, this, adress, port);
+     */
+    std::thread threadClient(&ConnectCommand::connectControlClient, this, adress, portCoommand);
     threadClient.detach();
     //threadClient.join();
     //return 4;
@@ -266,6 +283,20 @@ int DefineVarCommand::execute(vector<string> arrayStr, int i) {
         instance->simMap.insert({sim, value});
 
 /*
+
+        if (ifsleep== true){
+
+           // string toSim = "set controls/engines/current-engine/mixture 1\r\n";
+            string toSim = "\"/controls/engines/current-engine/mixture\"";
+            cout<<toSim<<endl;
+
+            ConnectCommand c;
+            c.sendToSimulator(toSim, 1);
+           // send(socketClient, toSim.c_str(), toSim.length(), 0);
+        }
+        */
+
+/*
         //go over the maps and check if we need to send value to the simulator
         //create new mutux
         std::mutex mutuxConnect;
@@ -317,28 +348,12 @@ ConditionParser::~ConditionParser() {};
 /**
  * Class for ifCommand
  */
-//constructor
-ifCommand::ifCommand(int num)
-        : index(num) {};
-
-int ifCommand::execute(vector<string> arrayStr, int i) {
-    cout << "in if command " << endl;
-    return 0;                              //????????????????????
-}
-
-//destructor
-ifCommand::~ifCommand() {};
-
-
-/**
- * Class for loopCommand
- */
-//constructor
 loopCommand::loopCommand(int num) : index(num) {};
 
 int loopCommand::execute(vector<string> arrayStr, int i) {
-    cout<<"@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"<<endl;
+    cout<<"&&&&&&&&&&&&&&&&&&&&"<<endl;
     //create symbol map
+    int numVr=0;
     SymbolTable *symbolsMaps = symbolsMaps->getInstance();
     //create new struct to save the variable name and index in the array
     struct varLoop {
@@ -346,19 +361,20 @@ int loopCommand::execute(vector<string> arrayStr, int i) {
         int indexVr;
     };
 
-    int j = index;
+    int j = i;
     //count the number of num to return
     while (arrayStr[j] != "}") {
         cout << "in while  " << arrayStr[j] << endl;
         j++;
-        num++;
+        numVr++;
     }
 
-    j = index;
+    j = i;
     //create new array to hold the variables we want to execute
-    varLoop arr[(num - 4) / 3];
+    varLoop arr[(numVr - 4) / 3];
     int p = 0;
     //go over the loop again
+    j= j+5;
     while (arrayStr[j] != "}") {
         if (symbolsMaps->symbolTable.find(arrayStr[j]) == symbolsMaps->symbolTable.end()) {
             //not found
@@ -366,6 +382,8 @@ int loopCommand::execute(vector<string> arrayStr, int i) {
             //found- save this name to our array - add index number and name
             arr[p].nameVr = arrayStr[j];
             arr[p].indexVr = j;
+
+            cout<<arr->indexVr<<endl;
             p++;
         }
         j++;
@@ -407,12 +425,14 @@ int loopCommand::execute(vector<string> arrayStr, int i) {
 //start check the sign of the loop
     if (signLoop == "<=") {
         while (nameLoopNum <= numberLoop) {
+            cout<<"nameLoopNum: "<<nameLoopNum<<"   numberLoop:  "<<numberLoop<<endl;
             for (varLoop k: arr) {
+                cout<<"varloop: "<< symbolsMaps->commandMap.find(k.nameVr)->first<<endl;
                 symbolsMaps->commandMap.find(k.nameVr)->second->execute(arrayStr, k.indexVr);
             }
         }
     }
-    if (signLoop == "=>") {
+    if (signLoop == ">=") {
         while (nameLoopNum >= numberLoop) {
             for (varLoop k: arr) {
                 symbolsMaps->commandMap.find(k.nameVr)->second->execute(arrayStr, k.indexVr);
@@ -447,9 +467,9 @@ int loopCommand::execute(vector<string> arrayStr, int i) {
             }
         }
     }
-    return num;
+    cout<<"jump in while:  "<<numVr<<endl;
+    return numVr;
 }
-
 //destructor
 loopCommand::~loopCommand() {};
 
@@ -477,7 +497,9 @@ Sleep::Sleep() {};
 
 int Sleep::execute(vector<string> arrayStr, int i) {
     // sleep(stoi(arrayStr[i+1]));                           //??????????????????????????????
+    std::this_thread::sleep_for(std::chrono::milliseconds(stoi(arrayStr[i+1])));
     cout << "sleep  " << stoi(arrayStr[i + 1]) << endl;
+    //ifsleep= true;
     return 2;
 }
 

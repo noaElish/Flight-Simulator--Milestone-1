@@ -5,7 +5,7 @@
 
 int data_received=0;
 bool done = true;
-
+std:: mutex mutaxMaps;
 //constructor
 Interpreter::Interpreter() {};
 
@@ -186,7 +186,7 @@ map<string, Command *> Interpreter::intoCommandMap(vector<string> splittedString
                 commandMap.insert({key, val});
             } else { // key= "if"
                 key = splittedStrings[num + 1];
-                val = new ifCommand(num);
+//                val = new ifCommand(num);
                 commandMap.insert({key, val});
             }
         }
@@ -196,7 +196,7 @@ map<string, Command *> Interpreter::intoCommandMap(vector<string> splittedString
 }
 
 
-//std::mutex mutuxParser;
+std::mutex mutexParser;
 //This function goes on array and executes the commands
 void Interpreter::parser(vector<string> splittedStrings) {
     //map to commands
@@ -209,6 +209,7 @@ void Interpreter::parser(vector<string> splittedStrings) {
     int i;
     int indexJump = 0;
     Command *c;
+   // mutexParser.lock();
     for (i = 0; i < splittedStrings.size(); i++) {
         if (commandMap.count(splittedStrings[i]) != 0) {
            // cout<<"sss: "<<splittedStrings[i]<<"   "<<splittedStrings[i+1]<<endl;
@@ -248,6 +249,7 @@ void Interpreter::parser(vector<string> splittedStrings) {
             i = i + indexJump - 1;
         }
     }
+   // mutexParser.unlock();
   data_received=1;
 }
 
@@ -311,40 +313,51 @@ SymbolTable *simMap = symbolsMaps->getInstance();
 
 //insert value to the command map
 void SymbolTable::intilizationCommandMap(vector<string> splittedStrings) {
+    mutaxMaps.lock();
     map<string, Command *> commandMap;
     Interpreter i;
     commandMap = i.intoCommandMap(splittedStrings, commandMap);
+    mutaxMaps.unlock();
 }
 
 //update a certain value in the symbol map
 void SymbolTable::upDateSymbolTable(string nameVar, Variable var) {
+    mutaxMaps.lock();
     instance->symbolTable.insert({nameVar, var});
+    mutaxMaps.unlock();
 }
 
 //return the variable of a certain key in the symbol map
 Variable SymbolTable::getVariable(string name) {
+    mutaxMaps.lock();
     symbolsMaps->symbolTable.find(name);
+    mutaxMaps.unlock();
 }
 
 //insert new value to sim map
 void SymbolTable::putInSimMap(int i, float num) {
+    mutaxMaps.lock();
     SymbolTable *instance = SymbolTable::getInstance();
     string simString = symbolsMaps->SetArrayOfSim(i);
     instance->simMap.insert({simString, num});
+    mutaxMaps.unlock();
 }
 
 //get the value of a certain sim in the sim map
 float SymbolTable::getValueFromSim(string sim) {
+    mutaxMaps.lock();
     float returnIt;
     auto search = simMap.find(sim);
     if (search != simMap.end()) {
         returnIt = search->second;
     }
+    mutaxMaps.unlock();
     return returnIt;
 }
 
 //create array of sim paths
 string SymbolTable::SetArrayOfSim(int i) {
+    mutaxMaps.lock();
     string arrSim[36];
     arrSim[0] = "/instrumentation/airspeed-indicator/indicated-speed-kt";
     arrSim[1] = "/sim/time/warp";
@@ -382,6 +395,7 @@ string SymbolTable::SetArrayOfSim(int i) {
     arrSim[33] = "/controls/switches/master-bat";
     arrSim[34] = "/controls/switches/master-alt";
     arrSim[35] = "/engines/engine/rpm";
+    mutaxMaps.unlock();
     return arrSim[i];
 }
 
