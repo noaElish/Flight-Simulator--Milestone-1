@@ -1,7 +1,10 @@
-
+#include <mutex>
 #include "Interpreter.h"
 #include "Expression.h"
 #include "ex1.h"
+
+int data_received=0;
+bool done = true;
 
 //constructor
 Interpreter::Interpreter() {};
@@ -129,15 +132,14 @@ map<string, Command *> Interpreter::intoCommandMap(vector<string> splittedString
             val = new Sleep();
             commandMap.insert({key, val});
         } else if (key.compare("var") == 0) {              /**need to change this**/
-        /*
-            key = splittedStrings[num + 1];
-            val = new DefineVarCommand();
-            commandMap.insert({key, val});
-
-            Variable *var = new Variable(0, splittedStrings[num + 4], splittedStrings[num + 2]);
-            SymbolTable *symbolsMaps = symbolsMaps->getInstance();
-            symbolsMaps->upDateSymbolTable(splittedStrings[num + 1], *var);
-            */
+            /*
+                key = splittedStrings[num + 1];
+                val = new DefineVarCommand();
+                commandMap.insert({key, val});
+                Variable *var = new Variable(0, splittedStrings[num + 4], splittedStrings[num + 2]);
+                SymbolTable *symbolsMaps = symbolsMaps->getInstance();
+                symbolsMaps->upDateSymbolTable(splittedStrings[num + 1], *var);
+                */
 
             //check if there is "->\<-" or "="
             if (splittedStrings[num+2]== "="){
@@ -154,7 +156,7 @@ map<string, Command *> Interpreter::intoCommandMap(vector<string> splittedString
                 //create new var
                 val = new DefineVarCommand();
                 commandMap.insert({key, val});
-                Variable *var = new Variable(save, "=", splittedStrings[num + 2]);
+                Variable *var = new Variable(save, "=", splittedStrings[num + 2],0);
                 //Variable *var = new Variable(save, "", splittedStrings[num + 2]);
                 SymbolTable *symbolsMaps = symbolsMaps->getInstance();
                 symbolsMaps->upDateSymbolTable(splittedStrings[num + 1], *var);
@@ -163,7 +165,7 @@ map<string, Command *> Interpreter::intoCommandMap(vector<string> splittedString
                 key = splittedStrings[num + 1];
                 val = new DefineVarCommand();
                 commandMap.insert({key, val});
-                Variable *var = new Variable(0, splittedStrings[num + 4], splittedStrings[num + 2]);
+                Variable *var = new Variable(0, splittedStrings[num + 4], splittedStrings[num + 2],0);
                 SymbolTable *symbolsMaps = symbolsMaps->getInstance();
                 symbolsMaps->upDateSymbolTable(splittedStrings[num + 1], *var);
             }
@@ -178,7 +180,8 @@ map<string, Command *> Interpreter::intoCommandMap(vector<string> splittedString
         } else if ((key.compare("while") == 0) || (key.compare("for") == 0) || (key.compare("if") == 0)) {
 
             if ((key.compare("while") == 0) || (key.compare("for") == 0)) {
-                key = splittedStrings[num + 1];
+                cout<<"WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW"<<endl;
+                key = splittedStrings[num];
                 val = new loopCommand(num);
                 commandMap.insert({key, val});
             } else { // key= "if"
@@ -192,6 +195,8 @@ map<string, Command *> Interpreter::intoCommandMap(vector<string> splittedString
     return commandMap;
 }
 
+
+//std::mutex mutuxParser;
 //This function goes on array and executes the commands
 void Interpreter::parser(vector<string> splittedStrings) {
     //map to commands
@@ -206,12 +211,16 @@ void Interpreter::parser(vector<string> splittedStrings) {
     Command *c;
     for (i = 0; i < splittedStrings.size(); i++) {
         if (commandMap.count(splittedStrings[i]) != 0) {
-            cout<<"sss: "<<splittedStrings[i]<<"   "<<splittedStrings[i+1]<<endl;
+           // cout<<"sss: "<<splittedStrings[i]<<"   "<<splittedStrings[i+1]<<endl;
             if ((i!=0)&&(splittedStrings[i-1]!="var")&&(splittedStrings[i]!="var")&&(splittedStrings[i-1]!="=")){
-                cout<<"1111"<<endl;
+                cout<<"start execute    +"<<splittedStrings[i]<<endl;
                 c = commandMap.find(splittedStrings[i])->second;
+
+               // data_received=1;
+//mutuxParser.lock();
                 indexJump = c->execute(splittedStrings, i);
-                cout<<"2222"<<endl;
+//mutuxParser.unlock();
+                cout<<"end execute"<<endl;
                 i = i + indexJump - 1;
             }
             if (i==0){
@@ -222,20 +231,24 @@ void Interpreter::parser(vector<string> splittedStrings) {
             }
         }
         if ((splittedStrings[i-1]=="var")&&(splittedStrings[i+1]=="=")){
+
+
+
             cout<<"4444444"<<endl;
 
             commandMap.insert({splittedStrings[i],  new DefineVarCommand()});
-            Variable *var = new Variable(0, "=", splittedStrings[i + 2]);
+            Variable *var = new Variable(0, "=", splittedStrings[i + 2],0);
             SymbolTable *symbolsMaps = symbolsMaps->getInstance();
             symbolsMaps->upDateSymbolTable(splittedStrings[i], *var);
 
-
+            //data_received=1;
 
             c = commandMap.find(splittedStrings[i])->second;
             indexJump = c->execute(splittedStrings, i);
             i = i + indexJump - 1;
         }
     }
+  data_received=1;
 }
 
 //destructor
@@ -245,14 +258,18 @@ Interpreter::~Interpreter() {};
  * Class Variable
  */
 //constructor
-Variable::Variable(float value, string simString, string directionString)
-        : value(value) {
+Variable::Variable(float value, string simString, string directionString, int updateS)
+        : value(value), update(updateS){
     sim = simString;
     direction = directionString;
+   // update= updateS;
 };
 //this method update the value
 void Variable::updateValue(float num) {
     value = num;
+}
+void Variable::updateStat(int num) {
+    update = num;
 }
 //return the direction of a certain variable
 string Variable::getDir() {
@@ -265,6 +282,9 @@ string Variable::getSim() {
 //return the numeric value of a certain variable
 float Variable::getVar() {
     return this->value;
+}
+int Variable::getUpdate(){
+    return this->update;
 }
 //constructor
 Variable::~Variable() {};
