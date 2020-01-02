@@ -17,10 +17,10 @@ Create code that allows remote control of an aircraft.
 
 ### **important classes, variables and objects:**
 * Class command
-* three maps:
-   -symbolMap: for the variables objects.
-   -simMap: for the simulator objects.
-   -
+* Three maps:
+   *symbolMap: for the variables objects.
+   *simMap: for the simulator objects.
+   *
    
 #### **how does it work?**
 Our program receives a file and breaks it into parts using the **lexer** function. We checked which of the strings were commands, and created a map that holds commands as the key, and a value that is a command variable from Of the right type. 
