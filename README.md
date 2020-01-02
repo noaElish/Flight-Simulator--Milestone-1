@@ -2,7 +2,9 @@
 
 # EX3 Project- Flight Simulatur 
 
-###### Submitted by- Shira Turgeman & Noa Elishmereni
+#### Creators:
+#### Shira Turgeman
+#### Noa Elishmereni
 
 ### **Basic information**
 * Purpose of this extercise-
@@ -12,12 +14,12 @@ Create code that allows remote control of an aircraft.
    * FlightGear simulator- [flightGear](https://www.flightgear.org/)
 
 * Files we used for this project:
-   * Fly.txt- 
-   * Generic_small.xml- 
+   * Fly.txt
+   * Generic_small.xml
 
 ### **important classes, variables and objects:**
 * Class command
-* Three maps:
+* Class SymbolTable- holds Three maps:
    * symbolMap: for the variables objects.
    * simMap: for the simulator objects.
    * commandMap: for all the command variable.
@@ -27,5 +29,8 @@ Our program receives a file and breaks it into parts using the **lexer** functio
   * for example: we inserted the command "open data server" into the map, with a variable "OpenServerCommand" as the value.
   
 after inserting the map with all the right commands, we started to execute each commnad by turn usuing the **parser** function. for the server and the client, we opened two different threads that runs simultaneously, and two different sockets.
-next, the parser executed all of the variables.
-through the whole run of the programm, we received values from the simulator (using the server socket), 
+next, the parser executed all of the variables. for each one, we check the direction of the arrow, and accordingly changes the values in the maps.
+
+through the whole run of the programm, we received values from the simulator (using the server socket), and sending value to the simulator (using the client socket). that way, the connection stay open through the whole run.
+
+
