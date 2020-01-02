@@ -19,7 +19,13 @@ Create code that allows remote control of an aircraft.
    * Generic_small.xml
 
 ### **important classes, variables and objects:**
-* Class command
+* Class command-
+   * open data server command
+   * connect control command
+   * define var command
+   * loop command
+   * print command
+   * sleep command
 * Class SymbolTable- holds Three maps:
    * symbolMap: for the variables objects.
    * simMap: for the simulator objects.
@@ -31,6 +37,7 @@ Our program receives a file and breaks it into parts using the **lexer** functio
   
 after inserting the map with all the right commands, we started to execute each commnad by turn usuing the **parser** function. for the server and the client, we opened two different threads that runs simultaneously, and two different sockets.
 next, the parser executed all of the variables. for each one, we check the direction of the arrow, and accordingly changes the values in the maps.
+we also payed attention to the loops in the file, and made a command variable that is responsible to take care of such cases.
 
 through the whole run of the programm, we received values from the simulator (using the server socket), and sending value to the simulator (using the client socket). that way, the connection stay open through the whole run.
 
