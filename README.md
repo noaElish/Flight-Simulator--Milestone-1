@@ -4,19 +4,15 @@
 
 ###### Submitted by- Shira Turgeman & Noa Elishmereni
 
+#### **Basic information**
 * Purpose of this extercise-
 Create a code sail that allows remote control of the aircraft.
 
 * Links we used for this project:
-   * 1.‫‪Download the flightgear simulator- [flightGear](https://www.flightgear.org/)
+   * 1. ‫‪Download the flightgear simulator- [flightGear](https://www.flightgear.org/)
 
+* Files we used for this project:
+   * 1. fly.txt- 
+   * 2. generic_small.xml- 
 
-
-
-
-
-
-
-
-
-## Interpreter
+#### **how does it work?**
