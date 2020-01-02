@@ -8,7 +8,7 @@
 Create a code sail that allows remote control of the aircraft.
 
 * Links we used for this project:
-⋅⋅⋅1.n
+   * 1.n
 
 
 
