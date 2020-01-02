@@ -2,8 +2,7 @@
 
 # EX3 Project- Flight Simulatur 
 
-### Creators:
-##### Shira Turgeman & Noa Elishmereni
+#### Creators:##### Shira Turgeman & Noa Elishmereni
 
 ### **Basic information**
 * Purpose of this extercise-
