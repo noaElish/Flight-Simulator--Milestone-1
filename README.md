@@ -1,6 +1,7 @@
  <p align="center">
  <img src="https://upload.wikimedia.org/wikipedia/commons/3/34/FlightGear_Logo.svg" width="80" height="80">
 </p>
+<span style="color:red; font-family:Georgia; text-align:center; font-size:2em;">The goal of the Women’s Enterprise Action Loan Fund, (WEALF): helping women business owners become financially self-sufficient.</span>
 <p align="center">
  ###Flight Simulatur 
 </p>
