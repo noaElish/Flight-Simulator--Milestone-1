@@ -2,9 +2,7 @@
  <img src="https://upload.wikimedia.org/wikipedia/commons/3/34/FlightGear_Logo.svg" width="80" height="80">
 </p>
 
-<p align="center">
-Flight Simulatur 
-</p>
+# Flight Simulatur 
 
 #### Creators: 
 ##### Shira Turgeman & Noa Elishmereni
