@@ -2,14 +2,15 @@
 
 # EX3 Project- Flight Simulatur 
 
-#### Creators: ##### Shira Turgeman & Noa Elishmereni
+#### Creators: 
+##### Shira Turgeman & Noa Elishmereni
 
 ### **Basic information**
 * Purpose of this extercise-
 Create code that allows remote control of an aircraft.
 
 * Links we used for this project:
-   * FlightGear simulator- [flightGear](https://www.flightgear.org/)
+   * [FlightGear simulator](https://www.flightgear.org/)
 
 * Files we used for this project:
    * Fly.txt
@@ -31,4 +32,5 @@ next, the parser executed all of the variables. for each one, we check the direc
 
 through the whole run of the programm, we received values from the simulator (using the server socket), and sending value to the simulator (using the client socket). that way, the connection stay open through the whole run.
 
+after wer'e done with the file, the programm prints "done" and we can close the sockets, and the threads.
 
