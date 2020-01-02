@@ -16,8 +16,8 @@ Create code that allows remote control of an aircraft.
    * Generic_small.xml- 
 
 ### **important classes, variables and objects:**
-1. Class command
-2. three maps:
+* Class command
+* three maps:
    -symbolMap: for the variables objects.
    -simMap: for the simulator objects.
    -
