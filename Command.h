@@ -1,3 +1,4 @@
+
 #ifndef EX3PROJECT_COMMAND_H
 #define EX3PROJECT_COMMAND_H
 #include <thread>
@@ -13,131 +14,133 @@
 #include <unistd.h>
 #include <unordered_set>
 #include <arpa/inet.h>
+#include <mutex>
 using namespace std;
+//global mutex.
+extern mutex mutexForChangeMaps;
 
 /**
  * command Interface
  */
 class Command {
-public:
-    virtual int execute(vector<string> arrayStr, int i) = 0;
-    //destructor
-    virtual ~Command(){};
+ public:
+  virtual int execute(vector<string> arrayStr, int i) = 0;
+  //destructor
+  virtual ~Command() {};
 };
 
 /**
  * Class for OpenServerCommand
  */
-class OpenServerCommand : public Command{
-protected:
-    int port;
-public:
-    //constructor
-    OpenServerCommand();
-    int execute(vector<string> arrayStr, int i);
-    //destructor
-    ~OpenServerCommand();
+class OpenServerCommand : public Command {
+ protected:
+  int port;
+ public:
+  //constructor
+  OpenServerCommand();
+  int execute(vector<string> arrayStr, int i);
+  //destructor
+  ~OpenServerCommand();
 };
-
 
 /**
  * Class for ConnectCommand
  */
-class ConnectCommand : public Command{
-protected:
-    string adress;
-    int port;
-public:
-    //constructor
-    ConnectCommand();
-    int execute(vector<string> arrayStr, int i);
-    //  void connectControlClient(string adressConnect, int port);
-    //destructor
-    ~ConnectCommand();
+class ConnectCommand : public Command {
+ protected:
+  string adress;
+  int portCommand; //create new socket
+  int socketClient = socket(AF_INET, SOCK_STREAM, 0);
+  //create the object for the bind
+  sockaddr_in addressS;
+
+ public:
+  //constructor
+  ConnectCommand();
+  void connectControlClient(string adressConnect, int port);
+  int execute(vector<string> arrayStr, int i);
+  void sendToSimulator(string simPath, float value);
+  //destructor
+  ~ConnectCommand();
 };
 
 /**
  * Class for DefineVarCommand
  */
-class DefineVarCommand : public Command{
-private:
-    int index;
-public:
-    DefineVarCommand();
-    //DefineVarCommand();  //every class will have a default constructor
-    int execute(vector<string> arrayStr, int i);
-    //destructor
-    ~DefineVarCommand();
+class DefineVarCommand : public Command {
+ private:
+  int index;
+ public:
+  DefineVarCommand();
+  //DefineVarCommand();  //every class will have a default constructor
+  int execute(vector<string> arrayStr, int i);
+  //destructor
+  ~DefineVarCommand();
 };
-
 
 /**
  * Class for ConditionParser
  */
-class ConditionParser : public Command{
-public:
-    //constructor
-    ConditionParser();
-    //destructor
-    ~ConditionParser();
+class ConditionParser : public Command {
+ public:
+  //constructor
+  ConditionParser();
+  //destructor
+  ~ConditionParser();
 };
-
 
 /**
  * Class for ifCommand
  */
-class ifCommand : public ConditionParser{
-private:
-    int index;
-public:
-    //constructor
-    ifCommand(int num);
-    int execute(vector<string> arrayStr, int i);
-    //destructor
-    ~ifCommand();
+class ifCommand : public ConditionParser {
+ private:
+  int index;
+ public:
+  //constructor
+  ifCommand(int num);
+  int execute(vector<string> arrayStr, int i);
+  //destructor
+  ~ifCommand();
 };
-
 
 /**
  * Class for loopCommand
  */
-class loopCommand : public ConditionParser{
-private:
-    int index;
-    int num;
-public:
-    //constructor
-    loopCommand(int num);
-    //loopCommand(){};//every class will have a default constructor
-    int execute(vector<string> arrayStr, int i);
-    //destructor
-    ~loopCommand();
+class loopCommand : public ConditionParser {
+ private:
+  int index;
+  int num;
+ public:
+  //constructor
+  loopCommand(int num);
+  //loopCommand(){};//every class will have a default constructor
+  int execute(vector<string> arrayStr, int i);
+  //destructor
+  ~loopCommand();
 };
-
 
 /**
  * Class for Print
  */
-class Print : public Command{
-public:
-    //constructor
-    Print();
-    virtual int execute(vector<string> arrayStr, int i);
-    //destructor
-    ~Print();
+class Print : public Command {
+ public:
+  //constructor
+  Print();
+  virtual int execute(vector<string> arrayStr, int i);
+  //destructor
+  ~Print();
 };
 
 /**
  * Class for Sleep
  */
-class Sleep : public Command{
-public:
-    //constructor
-    Sleep();
-    virtual int execute(vector<string> arrayStr, int i);
-    //destructor
-    ~Sleep();
+class Sleep : public Command {
+ public:
+  //constructor
+  Sleep();
+  virtual int execute(vector<string> arrayStr, int i);
+  //destructor
+  ~Sleep();
 };
-
 
 #endif //EX3PROJECT_COMMAND_H
