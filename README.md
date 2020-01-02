@@ -1,11 +1,10 @@
  <p align="center">
  <img src="https://upload.wikimedia.org/wikipedia/commons/3/34/FlightGear_Logo.svg" width="80" height="80">
 </p>
-<span style="color:red; font-family:Georgia; text-align:center; font-size:2em;">F.</span>
-<p align="center">
- ###Flight Simulatur 
-</p>
 
+<p align="center">
+Flight Simulatur 
+</p>
 
 #### Creators: 
 ##### Shira Turgeman & Noa Elishmereni
