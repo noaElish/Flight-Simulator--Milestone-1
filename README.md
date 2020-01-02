@@ -1,4 +1,4 @@
- <img src="https://your-image-url.type" width="100" height="100">
+ <img src="https://upload.wikimedia.org/wikipedia/commons/3/34/FlightGear_Logo.svg" width="100" height="100">
 
 ##                                                 EX3 Project- Flight Simulatur 
 
