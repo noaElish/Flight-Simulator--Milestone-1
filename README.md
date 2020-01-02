@@ -9,15 +9,19 @@
 Create code that allows remote control of an aircraft.
 
 * Links we used for this project:
-   * ‫‪Download the flightgear simulator- [flightGear](https://www.flightgear.org/)
+   * FlightGear simulator- [flightGear](https://www.flightgear.org/)
 
 * Files we used for this project:
-   * fly.txt- 
-   * generic_small.xml- 
+   * Fly.txt- 
+   * Generic_small.xml- 
 
 ### **important classes, variables and objects:**
-1. class command
-
+1. Class command
+2. three maps:
+   -symbolMap: for the variables objects.
+   -simMap: for the simulator objects.
+   -
+   
 #### **how does it work?**
 Our program receives a file and breaks it into parts using the **lexer** function. We checked which of the strings were commands, and created a map that holds commands as the key, and a value that is a command variable from Of the right type. 
   -for example: we inserted the command "open data server" into the map, with a variable "OpenServerCommand" as the value.
