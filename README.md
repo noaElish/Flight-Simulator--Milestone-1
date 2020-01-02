@@ -1,4 +1,5 @@
-![alt text](https://upload.wikimedia.org/wikipedia/commons/3/34/FlightGear_Logo.svg)
+ <img src="https://your-image-url.type" width="100" height="100">
+
 ##                                                 EX3 Project- Flight Simulatur 
 
 ###### Submitted by- Shira Turgeman & Noa Elishmereni
