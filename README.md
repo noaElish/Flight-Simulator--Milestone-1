@@ -1,6 +1,6 @@
  <img src="https://upload.wikimedia.org/wikipedia/commons/3/34/FlightGear_Logo.svg" width="100" height="100">
 
-# EX3 Project- Flight Simulatur 
+# Flight Simulatur 
 
 #### Creators: 
 ##### Shira Turgeman & Noa Elishmereni
