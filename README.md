@@ -6,6 +6,7 @@
 
 #### Creators: 
 ##### Shira Turgeman & Noa Elishmereni
+#####  [our GitHub](https://github.com/noaElish/ex3)
 
 ### **Basic information**
 * Purpose of this extercise-
