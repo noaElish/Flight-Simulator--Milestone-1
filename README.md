@@ -14,6 +14,9 @@ Create code that allows remote control of an aircraft.
 
 * Links we used for this project:
    * [FlightGear simulator](https://www.flightgear.org/)
+   * the two lines we inserted the flight gear:
+     "--telnet=socket,in,10,127.0.0.1,5402,tcp"
+     "--generic=socket,out,10,127.0.0.1,5400,tcp,generic_small"
 
 * Files we used for this project:
    * Fly.txt
@@ -44,3 +47,5 @@ through the whole run of the programm, we received values from the simulator (us
 
 after wer'e done with the file, the programm prints "done" and we can close the sockets, and the threads.
 
+### **spacial notes- for the coures them**
+when debbuging our programm, we used different printing (to follow the some of the problem when trying to solve it). after finishing debugging, the plane worked fine. we started deleteing the printing, but some of them interfered the programm from reasons we dont know (sence they are only prints for the programmer and not real code realted to the programm), so that we had to keep some of them and print empty srting instead. when running the code you may incounter some of the empty lines. we let the course them knoe about that.
