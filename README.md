@@ -47,5 +47,5 @@ through the whole run of the programm, we received values from the simulator (us
 
 after wer'e done with the file, the programm prints "done" and we can close the sockets, and the threads.
 
-### **spacial notes- for the coures team**
+#### **spacial notes- for the coures team**
 when debbuging our programm, we used different printing (to follow the some of the problem when trying to solve it). after finishing debugging, the plane worked fine. we started deleteing the prints, but some of them interfered the programm from reasons we dont know (sence they are only prints for the programmer and not real code realted to the programm), so that we had to keep some of them and print empty srting instead. when running the code you may incounter some of the empty lines. we let the course team know about that.
